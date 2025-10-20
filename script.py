@@ -27,4 +27,3 @@ my_f.delete_email_from_contact_table(file_path='ssphub_directory/test/replies.tx
 # my_f.fill_all_templates_from_grist()
 
 # my_f.fill_all_templates_from_grist('ssphub_directory/template.qmd', directory='ssphub/project')
-
