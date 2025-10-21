@@ -175,7 +175,7 @@ def clean_yaml_header(yaml_header, newsletter_url):
     cleaned_yaml['format'] = {
         'html': {
             'self-contained': True,  # To have images inside the email
-            'css': 'email/css/style.css'
+            'css': '../newsletter_tools/email/css/style.css'
             }
         }
 
