@@ -6,11 +6,11 @@ Tools to manage [SSPHub's](https://ssphub.netlify.app/) directory and [SSPHub's]
 
 ## Requirements
 - Have access to GRIST directory
-- Have : 
+- Have environment variables : 
     - GRIST_API_KEY : your API Key to use Grist (see [GRIST documentation](https://support.getgrist.com/rest-api/) to see how to access it)
     - GRIST_SSPHUB_DIRECTORY_ID : GRIST id of the SSPHub's Directory document (available on Grist)
     - GRIST_SSPHUB_WEBSITE_MERGE_ID : GRIST id of the internal table to merge old website to new website (available on Grist)
-- Apps : Python
+    - EMAIL_VALIDATION_TO, EMAIL_VALIDATION_CC, EMAIL_SSPHUB : email adresses 
 
 ## Step by step 
 
@@ -22,9 +22,9 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
     - reprendre les commentaires
     - Ouvrir Onyxia
     - Avoir ce repo chargé
-    - `cd <This repo>`  
+    - `cd newsletter_tools`  
     - Faire `uv sync` 
-    - Set interpreter path : F1 in VS Code and then select interpreter and choose <this.repo>/.venv/bin/python
+    - Set interpreter path : F1 in VS Code and then select interpreter and choose newsletter_tools/.venv/bin/python
     - go to script to generate email for validation
     - download email
     - add text to say It's the newsletter for clearance
