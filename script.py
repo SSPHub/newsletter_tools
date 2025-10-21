@@ -15,7 +15,7 @@ my_f.generate_email(
     email_from=None,
     email_cc=os.environ['EMAIL_VALIDATION_CC']+";"+os.environ['EMAIL_SSPHUB'])
 ## Send to all
-my_f.generate_email(newsletter_nb, 'main', 'Infolettre de rentrée', get_emails())
+my_f.generate_email(newsletter_nb, 'main', "Infolettre d'octobre", os.environ['EMAIL_SSPHUB'], my_f.get_emails())
 
 ## Treat replies
 my_f.add_to_grist_delete_table(my_f.extract_emails_from_txt(file_path='ssphub_directory/test/replies.txt'))
