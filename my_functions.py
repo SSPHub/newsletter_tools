@@ -152,7 +152,7 @@ def clean_yaml_header(yaml_header, newsletter_url):
             - datavis\n  - IA \n\ncategories:\n  - Infolettre\n\n',
             'https://ssphub.netlify.app/infolettre/'
             )
-        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../ssphub_directory/email_style/style.css\n"
+        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../newsletter_tools/email/css/style.css\n"
 
     """
 
@@ -175,7 +175,7 @@ def clean_yaml_header(yaml_header, newsletter_url):
     cleaned_yaml['format'] = {
         'html': {
             'self-contained': True,  # To have images inside the email
-            'css': '../ssphub_directory/email_style/style.css'
+            'css': 'email/css/style.css'
             }
         }
 
@@ -529,7 +529,7 @@ def get_emails():
     return '; '.join(my_directory_df['email'])
 
 
-def extract_emails_from_txt(file_path='ssphub_directory/test/replies.txt'):
+def extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt'):
     """
     Extract all email addresses from a file that contains all the automatic replies to a newsletter / an email.
 
@@ -642,14 +642,14 @@ def clean_br_values_df(df):
     return df
 
 
-def fill_template(path_to_template, df, directory_output='ssphub_directory'):
+def fill_template(path_to_template, df, directory_output='newsletter_tools'):
     """
     Update the variables in a template QMD file with the ones from a data table.
 
     Args:
         df (pandas object): data frame where to have the values. A column must be named 'nom_dossier'
         qmd_file (str): The path to the template QMD file. Format 'my_folder/subfolder/template.qmd'
-        directory_output (str): A string to paste before nom_dossier. Default is ssphub_directory/nom_dossier/index.qmd'
+        directory_output (str): A string to paste before nom_dossier. Default is newsletter_tools/nom_dossier/index.qmd'
 
     """
 
@@ -766,7 +766,7 @@ def get_grist_attachments_config():
     return url, headers
 
 
-def fill_all_templates_from_grist(path_to_template='ssphub_directory/template.qmd', directory='ssphub_directory'):
+def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site/template.qmd', directory='newsletter_tools'):
     """
     Fetch information from GRIST to create index.qmd and download the image data, move it to the right folder
 
@@ -852,9 +852,9 @@ def remove_files_dir(*file_paths):
 
 
 if __name__ == '__main__':
-    remove_files_dir('.temp/', 'ssphub_directory/test/')
+    remove_files_dir('.temp/', 'newsletter_tools/test/')
 
     fill_all_templates_from_grist()
     generate_email(19, 'main', 'Infolettre de rentrée', 'my_to_email@insee.fr', get_emails())
 
-    remove_files_dir('.temp/', 'ssphub_directory/test/')
+    remove_files_dir('.temp/', 'newsletter_tools/test/')

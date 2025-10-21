@@ -1,13 +1,12 @@
-from ssphub_directory.my_functions import *
+from newsletter_tools.my_functions import *
 import time  # for pausing code execution
 
 def test_generate_email():
     generate_email(19, 'main', 'Infolettre de rentrée', 'my_to_email@insee.fr', get_emails())
 
 
-def test_extract_emails():
-
-    # writing testing file
+def write_test_data():
+    # write test file
     lines = [
         'test1@example.com\n',  # Email alone
         'Contact me at test2@example.com for more information.\n',  # Email in the middle of a sentence
@@ -31,11 +30,13 @@ def test_extract_emails():
         'Contact me at test4@example.com for assistance.\n'  # Email in the middle of a sentence
     ]
 
-    with open('ssphub_directory/test/replies.txt', mode='w') as file:
+    with open('newsletter_tools/test/replies.txt', mode='w') as file:
         file.writelines(lines)
 
+
+def test_extract_emails():
     # Test function
-    assert "test9@example.com" in extract_emails_from_txt(file_path='ssphub_directory/test/replies.txt')
+    assert "test9@example.com" in extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt')
 
 
 def test_fill_template_one_row():
@@ -56,18 +57,18 @@ def test_fill_template_one_row():
         'nom_dossier': ['test/mytest']
     })
 
-    fill_template('ssphub_directory/template.qmd', df, 'ssphub_directory/')
+    fill_template('newsletter_tools/template.qmd', df, 'newsletter_tools/')
 
 
 def test_fill_template_two_rows():
     new_website_df = get_grist_merge_as_df()
-    fill_template('ssphub_directory/template.qmd', new_website_df.head(2), 'ssphub_directory/')
+    fill_template('newsletter_tools/template.qmd', new_website_df.head(2), 'newsletter_tools/')
 
 
 def test_website_merge():
     # df = get_website_merge_as_df().head(1)
     df = get_grist_merge_as_df()
-    fill_template('ssphub_directory/template.qmd', df)
+    fill_template('newsletter_tools/template.qmd', df)
 
 
 def test_update_polars():
@@ -102,7 +103,7 @@ def test_remove_rows():
     get_grist_directory_login().delete_records('Delete', get_ids_of_email('Delete', emails_list))
 
 def test_global():
-    remove_files_dir('.temp/', 'ssphub_directory/test/', 'test/')
+    remove_files_dir('.temp/', 'newsletter_tools/test/', 'test/')
 
-    fill_all_templates_from_grist(directory='ssphub_directory/test')
+    fill_all_templates_from_grist(directory='newsletter_tools/test')
     generate_email(19, 'main', 'Infolettre de rentrée', 'my_to_email@insee.fr', get_emails())

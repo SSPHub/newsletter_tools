@@ -1,6 +1,6 @@
-import ssphub_directory.my_functions  as my_f
+import newsletter_tools.my_functions  as my_f
 import importlib  # To reload package
-importlib.reload(my_f)  # When functions are updated
+# importlib.reload(my_f)  # When functions are updated
 import os
 
 # To generate email
@@ -18,12 +18,12 @@ my_f.generate_email(
 my_f.generate_email(newsletter_nb, 'main', "Infolettre d'octobre", os.environ['EMAIL_SSPHUB'], my_f.get_emails())
 
 ## Treat replies
-my_f.add_to_grist_delete_table(my_f.extract_emails_from_txt(file_path='ssphub_directory/test/replies.txt'))
+my_f.add_to_grist_delete_table(my_f.extract_emails_from_txt(file_path='newsletter_tools/input/replies.txt'))
 ## If trust in the code : 
-my_f.delete_email_from_contact_table(file_path='ssphub_directory/test/replies.txt')
+my_f.delete_email_from_contact_table(file_path='newsletter_tools/input/replies.txt')
 
 # To generate template
 # my_f.remove_files_dir('ssphub/project/test')
 # my_f.fill_all_templates_from_grist()
 
-# my_f.fill_all_templates_from_grist('ssphub_directory/template.qmd', directory='ssphub/project')
+# my_f.fill_all_templates_from_grist('newsletter_tools/fusion_site/template.qmd', directory='ssphub/project')
