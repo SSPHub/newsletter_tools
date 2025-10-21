@@ -1,0 +1,20 @@
+test1@example.com
+Contact me at test2@example.com for more information.
+This is a normal line of text.
+Email: test3@example.com
+Please send your feedback to test4@example.com.
+Another normal line of text.
+test5@example.com
+You can reach me at test6@example.com if you have any questions.
+Yet another normal line of text.
+Email address: test7@example.com
+Contact us at test8@example.com for support.
+More normal text here.
+test9@example.com
+Please email your inquiries to test10@example.com.
+Still normal text.
+Email: test1@example.com
+You can find more details at test2@example.com.
+Normal text continues.
+test3@example.com
+Contact me at test4@example.com for assistance.

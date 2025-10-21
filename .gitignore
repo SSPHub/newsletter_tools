@@ -5,7 +5,9 @@ res.qmd
 
 # Test
 2023_Enquete_Budget_Famille/
-test/
+test/*.txt
+!test/replies.txt
+test/*.qmd
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
