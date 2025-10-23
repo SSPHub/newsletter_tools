@@ -38,8 +38,8 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 - Après envoi : 
     - Cleaning de la mailing list : copier tous les messages d'erreurs dans un fichier "replies.txt"
     - Pour les supprimer : 
-        - Manuel : Function add_to_grist_delete_table va en extraire les emails et les poster sur Grist
         - Automatique : Function delete_email_from_contact_table va extraire les emails et les supprimer de la table Contact de Grist
+        - *Fonction supprimée - Manuel : Function add_to_grist_delete_table va en extraire les emails et les poster sur Grist*
 
 ### Fusion site SSPHub / SSPLab
  - To import draft template to SSPHub's site, go to script.py and run fill_all_templates_from_grist

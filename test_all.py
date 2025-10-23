@@ -85,22 +85,6 @@ def test_grist_attachment_download():
     download_file(url, output_dir='.temp/', headers=headers)
     unzip_dir('.temp/Fusion_site_SSPHub-Attachments.zip', '.temp/extracted_data')
 
-def test_add_email_grist():
-    # Test file definition
-    lines = [
-        'test1@example.com',
-        'test3@example.com'
-    ]
-    add_to_grist_delete_table(lines)
-
-def test_remove_rows():
-    emails_list = [
-        'test1@example.com',
-        'test3@example.com'
-    ]
-    add_to_grist_delete_table(emails_list)
-    time.sleep(3)
-    get_grist_directory_login().delete_records('Delete', get_ids_of_email('Delete', emails_list))
 
 def test_global():
     remove_files_dir('.temp/', 'newsletter_tools/test/', 'test/')

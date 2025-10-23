@@ -556,20 +556,6 @@ def extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt'):
     return emails
 
 
-def add_to_grist_delete_table(data_list):
-    """
-    Export a list of email adresses to Grist to delete table
-
-    Args:
-        data_list (list): The list of email to export to Grist
-
-    Returns:
-        None
-    """
-
-    get_grist_directory_login().add_records('Delete', [{'Emails_to_delete': email} for email in data_list])
-
-
 def get_ids_of_email(table_id, emails_list):
     """
     Return the ids of the rows of the email in the GRIST directory

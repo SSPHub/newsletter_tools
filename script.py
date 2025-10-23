@@ -18,8 +18,6 @@ my_f.generate_email(
 my_f.generate_email(newsletter_nb, 'main', "[SSPHub] Infolettre d'octobre", os.environ['EMAIL_SSPHUB'], my_f.get_emails())
 
 ## Treat replies
-my_f.add_to_grist_delete_table(my_f.extract_emails_from_txt(file_path='newsletter_tools/input/replies.txt'))
-## If trust in the code : 
 my_f.delete_email_from_contact_table(file_path='newsletter_tools/input/replies.txt')
 
 # To generate template
