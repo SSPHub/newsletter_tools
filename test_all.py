@@ -1,6 +1,10 @@
 from newsletter_tools.my_functions import *
 import time  # for pausing code execution
 
+def test_fetch_grist():
+    fetch_grist_table_as_pl(get_grist_merge_website_login(), 'Intranet_details')
+
+
 def test_generate_email():
     generate_email(19, 'main', 'Infolettre de rentrée', 'my_to_email@insee.fr', get_emails())
 
@@ -35,13 +39,14 @@ def write_test_data():
 
 
 def test_extract_emails():
+    write_test_data()
     # Test function
     assert "test9@example.com" in extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt')
 
 
 def test_fill_template_one_row():
     # Create a test DataFrame with the variables to replace
-    df = pd.DataFrame({
+    df = pl.DataFrame({
         'my_title': ['Title test'],
         'my_description': ['Description test'],
         'my_authors': ['- John \n- Jackie'],
@@ -57,25 +62,25 @@ def test_fill_template_one_row():
         'nom_dossier': ['test/mytest']
     })
 
-    fill_template('newsletter_tools/template.qmd', df, 'newsletter_tools/')
+    fill_template('newsletter_tools/fusion_site/template.qmd', df, 'newsletter_tools/test')
 
 
 def test_fill_template_two_rows():
     new_website_df = get_grist_merge_as_df()
-    fill_template('newsletter_tools/template.qmd', new_website_df.head(2), 'newsletter_tools/')
+    fill_template('newsletter_tools/fusion_site/template.qmd', new_website_df.head(2), 'newsletter_tools/test')
 
 
 def test_website_merge():
     # df = get_website_merge_as_df().head(1)
     df = get_grist_merge_as_df()
-    fill_template('newsletter_tools/template.qmd', df)
+    fill_template('newsletter_tools/fusion_site/template.qmd', df)
 
 
 def test_update_polars():
     print(get_directory_as_df())
 
 def test_update_polars2():
-    get_emails()
+    get_ids_of_email(['nicolas.toulemonde@insee.fr'])
 
 
 def test_grist_attachment_download():

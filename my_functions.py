@@ -6,7 +6,7 @@
 #     "pyyaml",
 #     "requests",
 #     "grist-api",
-#     "pandas",
+#     "polars",
 # ]
 # ///
 
@@ -17,7 +17,6 @@ import yaml  # To update newsletter qmd metadata for the email
 import os  # to remove temporary files, create directory etc
 from grist_api import GristDocAPI  # To get directory emails
 import polars as pl  # to manage directory emails
-import pandas as pd  # to manage directory emails
 import re  # For pattern matching to search for emails
 import shutil  # to remove directory and its content
 import zipfile  # GRIST attachments
@@ -556,7 +555,7 @@ def extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt'):
     return emails
 
 
-def get_ids_of_email(table_id, emails_list):
+def get_ids_of_email(emails_list):
     """
     Return the ids of the rows of the email in the GRIST directory
 
@@ -569,7 +568,7 @@ def get_ids_of_email(table_id, emails_list):
     """
     # Get the latest GRIST directory
     api_directory = get_grist_directory_login()
-    directory_df = fetch_grist_table_as_pl(api_directory, 'Contacts')
+    directory_df = fetch_grist_table_as_pl(api_directory, 'Contact')
     directory_df = directory_df.select(['id', 'email'])
 
     # Filter the emails
@@ -706,7 +705,7 @@ def fetch_grist_table_as_pl(grist_api_details, table_id):
         {
             k: (
                 ';'.join([str(s) for s in v])
-                if isinstance(v, list)
+                if isinstance(v, list) and len(v)>0
                 else v
             )
             for k, v in d.items()
@@ -714,7 +713,7 @@ def fetch_grist_table_as_pl(grist_api_details, table_id):
         for d in table_dict
     ]
 
-    return pl.DataFrame(transformed_records)
+    return pl.DataFrame(transformed_records, infer_schema_length=None)
 
 
 def get_grist_merge_as_df():
