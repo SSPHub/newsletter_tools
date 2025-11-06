@@ -462,7 +462,7 @@ def generate_email(number,
         remove_files_dir(temp_file_qmd, temp_file_html)
 
 
-def get_grist_directory_login():
+def get_dinum_grist_login(doc_grist_id):
     """
     Send back GRIST API login details
 
@@ -474,18 +474,17 @@ def get_grist_directory_login():
     """
     # Log in to GRIST API
     SERVER = "https://grist.numerique.gouv.fr/"
-    DOC_ID = os.environ['GRIST_SSPHUB_DIRECTORY_ID']
 
     if 'GRIST_API_KEY' not in os.environ:
         raise ValueError("The GRIST_API_KEY environment variable does not exist.")
 
     # Returning API details connection
-    return GristDocAPI(DOC_ID, server=SERVER)
+    return GristDocAPI(doc_grist_id, server=SERVER)
 
 
 def get_directory_as_df():
     """
-    Fetch back direcory of SSPHUB as a Panda dataframe
+    Fetch back direcory of SSPHUB as a pl dataframe
 
     Args:
         None
@@ -494,8 +493,7 @@ def get_directory_as_df():
         A pl.DataFrame with three columns : ['email', 'Supprimez_mon_compte', 'nom', 'Nom_domaine']
     """
     # fetch all the rows
-    api_directory = get_grist_directory_login()
-    directory_df = fetch_grist_table_as_pl(api_directory, 'Contact')
+    directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
     
     # Selecting minimum set of columns
     cols_to_keep = [
@@ -567,8 +565,7 @@ def get_ids_of_email(emails_list):
 
     """
     # Get the latest GRIST directory
-    api_directory = get_grist_directory_login()
-    directory_df = fetch_grist_table_as_pl(api_directory, 'Contact')
+    directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
     directory_df = directory_df.select(['id', 'email'])
 
     # Filter the emails
@@ -671,32 +668,21 @@ def fill_template(path_to_template, df, directory_output='newsletter_tools'):
     return template_content
 
 
-def get_grist_merge_website_login():
-    # Log in to GRIST API
-    SERVER = "https://grist.numerique.gouv.fr/"
-    DOC_ID = os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID']
-
-    if 'GRIST_API_KEY' not in os.environ:
-        raise ValueError("The GRIST_API_KEY environment variable does not exist.")
-
-    # Returning API details connection
-    return GristDocAPI(DOC_ID, server=SERVER)
-
-
-def fetch_grist_table_as_pl(grist_api_details, table_id):
+def fetch_grist_table_as_pl(doc_grist_id, table_id):
     """
     Get a grist table as a polar dataframe. It transforms Grist records :
     - If the value is a list (not a tuple) and the first element is 'L', we want an
       array of all elements 1...end
     
     Args:
-        grist_api_details : a grist api 
+        doc_grist_id : id of the grist document 
         table_id (string) : id of the Grist table
     
     Return: 
         A pl dataframe
     """
-    table_grist_records = grist_api_details.fetch_table(table_id)
+    grist_api = get_dinum_grist_login(doc_grist_id)
+    table_grist_records = grist_api.fetch_table(table_id)
     table_dict = [record._asdict() for record in table_grist_records]
     
     # Cleaning Grist lists - causes a pb with polars. from 
@@ -733,8 +719,7 @@ def get_grist_merge_as_df():
     [17 rows x 12 columns]
     """
     # fetch all the rows
-    api_merge = get_grist_merge_website_login()
-    new_website_df = fetch_grist_table_as_pl(api_merge, 'Intranet_details')
+    new_website_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID'], 'Intranet_details')
 
     # Selecting useful columns
     cols_to_keep = ['id', 'Acteurs', 'Resultats', 'Details_du_projet',
