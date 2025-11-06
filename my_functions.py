@@ -603,10 +603,10 @@ def clean_br_values_df(df):
     Replace the /n by HTML <br> mark up or nothing for columns who will end up in a Md table/YAML part
 
     Args:
-        df (pd.Dataframe): the grist table to merge
+        df (pl.Dataframe): the grist table to merge
 
     Returns;
-        df (pd.DataFrame): cleaned df
+        df (pl.DataFrame): cleaned df
     """
 
     # For columns containing 'my table', we replace the break with <br>
@@ -614,7 +614,9 @@ def clean_br_values_df(df):
 
     # Replace '\n' with '<br>' in the identified columns
     for col in columns_to_replace:
-        df[col] = df[col].astype(str).str.replace('\n', ' <br> ')
+        df = df.with_columns(
+            pl.col(col).cast(pl.Utf8).str.replace_all(r'\n', ' <br> ')
+        )
 
     # For columns containing 'my yaml', we replace the break with ''
     # columns_to_replace = [col for col in df.columns if 'my_yaml' in col]
@@ -622,7 +624,9 @@ def clean_br_values_df(df):
 
     # Replace '\n' with '<br>' in the identified columns
     for col in columns_to_replace:
-        df[col] = df[col].astype(str).str.replace('\n', ' ')
+        df = df.with_columns(
+            pl.col(col).cast(pl.Utf8).str.replace_all(r'\n', ' ')
+        )
 
     return df
 
@@ -632,16 +636,18 @@ def fill_template(path_to_template, df, directory_output='newsletter_tools'):
     Update the variables in a template QMD file with the ones from a data table.
 
     Args:
-        df (pandas object): data frame where to have the values. A column must be named 'nom_dossier'
+        df (polars object): data frame where to have the values. A column must be named 'nom_dossier'
         qmd_file (str): The path to the template QMD file. Format 'my_folder/subfolder/template.qmd'
         directory_output (str): A string to paste before nom_dossier. Default is newsletter_tools/nom_dossier/index.qmd'
 
     """
 
     # Add directory before the output folder in df
-    df['nom_dossier'] = directory_output.strip('/') + '/' + df['nom_dossier'].str.strip('/')
+    df = df.with_columns(
+        (directory_output.strip('/') + '/' + pl.col('nom_dossier').str.strip_chars_end('/')).alias('nom_dossier')
+    )
 
-    for index, row in df.iterrows():
+    for row in df.iter_rows(named=True):
 
         with open(path_to_template, 'r') as file:
             template_content = file.read()
@@ -652,9 +658,9 @@ def fill_template(path_to_template, df, directory_output='newsletter_tools'):
             template_content = template_content.replace('{{' + variable_name + '}}', str(variable_value))
 
         # Create the output directory if it doesn't exist
-        os.makedirs(df.at[index, 'nom_dossier'], exist_ok=True)
+        os.makedirs(row['nom_dossier'], exist_ok=True)
 
-        output_file_path = df.at[index, 'nom_dossier'] + '/index.qmd'
+        output_file_path = row['nom_dossier'] + '/index.qmd'
 
         # Remove the file and write it
         remove_files_dir(output_file_path)
@@ -699,8 +705,8 @@ def fetch_grist_table_as_pl(grist_api_details, table_id):
     transformed_records = [
         {
             k: (
-                v[1:]
-                if isinstance(v, list) and len(v) > 0 and v[0] == "L"
+                ';'.join([str(s) for s in v])
+                if isinstance(v, list)
                 else v
             )
             for k, v in d.items()
@@ -782,7 +788,7 @@ def get_grist_attachments_config():
     return url, headers
 
 
-def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site/template.qmd', directory='newsletter_tools'):
+def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site/template.qmd', directory='newsletter_tools/test'):
     """
     Fetch information from GRIST to create index.qmd and download the image data, move it to the right folder
 
@@ -803,7 +809,10 @@ def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site
     pages_df = clean_br_values_df(pages_df)
 
     # Droping rows with empty nom_dossier and keeping only the one to_update
-    pages_df = pages_df.query('nom_dossier != "" and to_update == True ')
+    pages_df = pages_df.filter(
+        pl.col('nom_dossier') != "",
+        pl.col('to_update')
+    )
 
     # Create the index.qmd by calling the function
     fill_template(path_to_template, pages_df, directory_output=directory)
@@ -830,14 +839,16 @@ def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site
     attachments_dict['short_image_name'] = [image[41:] for image in attachments_list]
     attachments_dict['local_image_path'] = [unzip_dir_path + '/' + image for image in attachments_list]
     # Selecting the two useful columns
-    pages_df = pages_df[['nom_dossier', 'my_yaml_image_path']]
-    # Merging the two
-    pages_df = pages_df.merge(pd.DataFrame.from_dict(attachments_dict), how='left', left_on='my_yaml_image_path', right_on='short_image_name')
-    # Creating destination file
-    pages_df['dest_image_path'] = pages_df['nom_dossier'] + '/' + pages_df['my_yaml_image_path']
-    pages_df.dropna(subset='local_image_path', inplace=True)  # Droping files where didn't download image
+    pages_df = pages_df.select(['nom_dossier', 'my_yaml_image_path'])
+    
+    # Merging the two and creating destination file
+    pages_df = pages_df\
+        .join(pl.from_dict(attachments_dict), how='left', left_on='my_yaml_image_path', right_on='short_image_name')\
+        .with_columns((directory + '/' + pl.col('nom_dossier') + '/' + pl.col('my_yaml_image_path')).alias('dest_image_path'))\
+        .drop_nulls(subset='local_image_path')  # Droping files where didn't download image
+    
     # Moving all images to their folder
-    for index, row in pages_df.iterrows():
+    for row in pages_df.iter_rows(named=True):
         os.rename(row['local_image_path'], row['dest_image_path'])
         print(f'File {row['local_image_path']} == moved to ==> {row['dest_image_path']}')
 
@@ -874,3 +885,4 @@ if __name__ == '__main__':
     generate_email(19, 'main', 'Infolettre de rentrée', 'my_to_email@insee.fr', get_emails())
 
     remove_files_dir('.temp/', 'newsletter_tools/test/')
+
