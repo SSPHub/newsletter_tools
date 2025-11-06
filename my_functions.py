@@ -496,13 +496,13 @@ def get_directory_as_df():
     """
     # fetch all the rows
     api_directory = get_grist_directory_login()
-    directory_df = api_directory.fetch_table('Contact')
-    directory_df = pl.DataFrame(directory_df, infer_schema_length=None)
-
+    directory_df = fetch_grist_table_as_pl(api_directory, 'Contact')
+    
     # Selecting minimum set of columns
     cols_to_keep = [
         'email', 'Supprimez_mon_compte', 'nom', 'Nom_domaine'
         ]
+    
     directory_df = directory_df.select(cols_to_keep)
 
     return directory_df
@@ -569,8 +569,8 @@ def get_ids_of_email(table_id, emails_list):
     """
     # Get the latest GRIST directory
     api_directory = get_grist_directory_login()
-    directory_df = api_directory.fetch_table(table_id)
-    directory_df = pl.DataFrame(pd.DataFrame(directory_df)[["id", "email"]])  # Using pandas bcs pl has an issue with list input from Grist
+    directory_df = fetch_grist_table_as_pl(api_directory, 'Contacts')
+    directory_df = directory_df.select(['id', 'email'])
 
     # Filter the emails
     res = directory_df.filter(pl.col('email').is_in(emails_list))
@@ -596,7 +596,6 @@ def delete_email_from_contact_table(file_path):
     print(str(len(emails_id)) + ' emails trouvés dans la table Contact \n')
     get_grist_directory_login().delete_records('Contact', emails_id)
     print('Emails supprimés de la table Contact \n')
-
 
 
 def clean_br_values_df(df):
@@ -679,6 +678,39 @@ def get_grist_merge_website_login():
     return GristDocAPI(DOC_ID, server=SERVER)
 
 
+def fetch_grist_table_as_pl(grist_api_details, table_id):
+    """
+    Get a grist table as a polar dataframe. It transforms Grist records :
+    - If the value is a list (not a tuple) and the first element is 'L', we want an
+      array of all elements 1...end
+    
+    Args:
+        grist_api_details : a grist api 
+        table_id (string) : id of the Grist table
+    
+    Return: 
+        A pl dataframe
+    """
+    table_grist_records = grist_api_details.fetch_table(table_id)
+    table_dict = [record._asdict() for record in table_grist_records]
+    
+    # Cleaning Grist lists - causes a pb with polars. from 
+    # https://github.com/uaw-union/sheets-parquet-server/blob/19acaa3ef9ab65f9229b3df5e7007b8cc1fffca0/src/main.py#L4
+    transformed_records = [
+        {
+            k: (
+                v[1:]
+                if isinstance(v, list) and len(v) > 0 and v[0] == "L"
+                else v
+            )
+            for k, v in d.items()
+        }
+        for d in table_dict
+    ]
+
+    return pl.DataFrame(transformed_records)
+
+
 def get_grist_merge_as_df():
     """
     Get the table from GRIST to fetch all infos about index pages to create
@@ -687,7 +719,7 @@ def get_grist_merge_as_df():
         None
 
     Returns:
-        A pd dataframe with columns matching the template variable names
+        A pl dataframe with columns matching the template variable names
 
     Example:
         >>> get_grist_merge_as_df()
@@ -697,16 +729,14 @@ def get_grist_merge_as_df():
     """
     # fetch all the rows
     api_merge = get_grist_merge_website_login()
-    new_website_df = api_merge.fetch_table('Intranet_details')
-    # Pb with attachment column with polars, so pass by pandas
-    new_website_df = pd.DataFrame(new_website_df)
+    new_website_df = fetch_grist_table_as_pl(api_merge, 'Intranet_details')
 
     # Selecting useful columns
     cols_to_keep = ['id', 'Acteurs', 'Resultats', 'Details_du_projet',
        'sous_titre', 'Code_du_projet', 'tags', 'nom_dossier', 'date',
        'image', 'Titre', 'auteurs', 'to_update']
 
-    new_website_df = new_website_df[cols_to_keep]
+    new_website_df = new_website_df.select(cols_to_keep)
 
     # Dictionnary for renaming variables / Right part must correspond to template keywords
     variable_mapping = {
@@ -722,9 +752,9 @@ def get_grist_merge_as_df():
         'Code_du_projet': 'my_table_repo_path'
     }
 
-    new_website_df = new_website_df.rename(columns=variable_mapping)
-
-    new_website_df['my_table_title'] = new_website_df['my_yaml_title']
+    new_website_df = new_website_df\
+        .rename(variable_mapping)\
+        .with_columns(pl.col('my_yaml_title').alias('my_table_title'))
 
     return new_website_df
 
