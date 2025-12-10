@@ -21,49 +21,62 @@ import re  # For pattern matching to search for emails
 import shutil  # to remove directory and its content
 import zipfile  # GRIST attachments
 
-def generate_eml_file(email_body, subject, bcc_recipient, to_recipient='EMAIL_SSPHUB', cc_recipient='', from_sender=None):
+########################################################################################## 
+### Common tools 
+##########################################################################################
+
+def fetch_grist_table_as_pl(doc_grist_id, table_id):
     """
-    Creates an .eml file and saves it to .temp/email.eml
+    Get a grist table as a polar dataframe. It transforms Grist records :
+    - If the value is a list (not a tuple) and the first element is 'L', we want an
+      array of all elements 1...end
+    
+    Args:
+        doc_grist_id : id of the grist document 
+        table_id (string) : id of the Grist table
+    
+    Return: 
+        A pl dataframe
+    """
+    grist_api = get_dinum_grist_login(doc_grist_id)
+    table_grist_records = grist_api.fetch_table(table_id)
+    table_dict = [record._asdict() for record in table_grist_records]
+    
+    # Cleaning Grist lists - causes a pb with polars. from 
+    # https://github.com/uaw-union/sheets-parquet-server/blob/19acaa3ef9ab65f9229b3df5e7007b8cc1fffca0/src/main.py#L4
+    transformed_records = [
+        {
+            k: (
+                ';'.join([str(s) for s in v])
+                if isinstance(v, list) and len(v)>0
+                else v
+            )
+            for k, v in d.items()
+        }
+        for d in table_dict
+    ]
+
+    return pl.DataFrame(transformed_records, infer_schema_length=None)
+
+
+def get_dinum_grist_login(doc_grist_id):
+    """
+    Send back GRIST API login details
 
     Args:
-        email_body (string): html body of the email
-        subject (string): Object of the email
-        bcc_recipient (string): list of recipients of the emails to put in bcc
-        to_recipient (string): Email of the sender to indicate (be cautious, it doesn't automate the sending)
-        The email will be sent to himself
-        cc_recipient (string): list of recipients of the emails to be put in cc
-        from_sender(string or None): email adresses to send from. If None, default Outlook
+        None
 
     Returns:
-        None
-    Nb : create the email to .temp/email.eml with a message
-
-    Example:
-        >>> generate_eml_file('body', 'this an email', 'test@test.fr')
-    Email saved as .temp/email.eml
+        A GristDocAPI object
     """
-    msg = MIMEMultipart()
-    msg['Subject'] = subject
-    msg['BCC'] = bcc_recipient
-    msg['CC'] = cc_recipient
-    msg['To'] = to_recipient   # Auto send the email
-    if from_sender is not None:
-        msg['From'] = from_sender  # Set the sender's email address
-    msg['X-Unsent'] = '1'  # Mark the email as unsent : when the file is opened, it can be sent.
+    # Log in to GRIST API
+    SERVER = "https://grist.numerique.gouv.fr/"
 
-    # Attach the HTML body
-    msg.attach(MIMEText(email_body, 'html'))
+    if 'GRIST_API_KEY' not in os.environ:
+        raise ValueError("The GRIST_API_KEY environment variable does not exist.")
 
-    # Save the email as an .eml file
-    eml_file_path = '.temp/email.eml'
-
-    # Create the output directory if it doesn't exist
-    os.makedirs('.temp', exist_ok=True)
-
-    with open(eml_file_path, 'wb') as f:
-        f.write(msg.as_bytes())
-
-    print(f"Email saved as {eml_file_path}")
+    # Returning API details connection
+    return GristDocAPI(doc_grist_id, server=SERVER)
 
 
 def fetch_qmd_file(url):
@@ -90,99 +103,6 @@ def fetch_qmd_file(url):
         return None
 
 
-def process_qmd_file(qmd_content, qmd_output_file, newsletter_url='https://ssphub.netlify.app/infolettre/'):
-    """
-    Transform a newsletter qmd file to a qmd file that will be knitted by
-    calling the function to transform the yaml part of the qmd file
-
-    Args:
-        qmd_content (string): the original qmd file to process, typically the result of fetch_qmd_file
-        qmd_output_file (string): the path of the qmd file to write
-        newsletter_url (string): to pass the argument onto yaml to insert link to newsletter
-
-    Returns:
-        None
-    Nb : writes the processed qmd file
-
-    Example:
-        >>> process_qmd_file(
-    fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd'),
-    'cleaned_index.qmd')
-    """
-
-    # qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd')
-    # Split the YAML header and the HTML content
-    parts = qmd_content.split('---', 2)
-    if len(parts) < 3:
-        print("Invalid .qmd file format")
-        return None
-
-    yaml_header = parts[1]
-    html_content = parts[2]
-
-    # Clean the YAML header
-    cleaned_yaml_header = clean_yaml_header(yaml_header, newsletter_url)
-
-    # Combine the cleaned YAML header and HTML content
-    processed_qmd_content = f"---\n{cleaned_yaml_header}---\n{html_content}"
-
-    # Save the processed QMD content to a file
-    with open(qmd_output_file, 'w', encoding='utf-8') as f:
-        f.write(processed_qmd_content)
-
-
-def clean_yaml_header(yaml_header, newsletter_url):
-    """
-    Function to transform Yaml header of an index.qmd file and transform it for a qmd file that will be
-    knitted to html. It keeps only title, updates the description with the link to the website,
-    add lang, format and format options, including a css file.
-
-    Arg :
-        yaml_header: input yaml_header to clean, as string
-        newsletter_url: url of the newsletter to insert a link to that newsletter
-
-    Returns:
-        (string, with Unicode formating) url to raw Qmd newsletter
-
-    Example:
-        >>> clean_yaml_header(
-            '\ntitle: "La rentrée 2025:"\n\ndescription: |\n  Infolettre de __Septembre 2025__
-            \n\n# Date published\ndate: \'2025-09-29\'\nnumber: 19\n\nauthors:\n  - Nicolas\n\nimage: mage.png\n\ntags:\n
-            - datavis\n  - IA \n\ncategories:\n  - Infolettre\n\n',
-            'https://ssphub.netlify.app/infolettre/'
-            )
-        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../newsletter_tools/email/css/style.css\n"
-
-    """
-
-    # Parse the YAML header1
-    yaml_data = yaml.safe_load(yaml_header)
-
-    # Keep only the specified keys
-    # We put the link
-    description = ("*" + yaml_data.get('description', '').strip() +
-                " disponible sur le site du [réseau](" + newsletter_url + ")*"
-                )
-
-    cleaned_yaml = {
-        'title': yaml_data.get('title', '').strip(),
-        'description': description
-                }
-
-    # Add missing params
-    cleaned_yaml['lang'] = 'fr'
-    cleaned_yaml['format'] = {
-        'html': {
-            'self-contained': True,  # To have images inside the email
-            'css': '../newsletter_tools/email/css/style.css'
-            }
-        }
-
-    # Convert the cleaned YAML back to a string
-    cleaned_yaml_str = yaml.dump(cleaned_yaml, sort_keys=False,  allow_unicode=True, width=4096)
-    return cleaned_yaml_str
-
-
 def knit_to_html(processed_qmd_file):
     """
     knit a qmd file to html
@@ -201,38 +121,6 @@ def knit_to_html(processed_qmd_file):
         print("QMD file successfully knitted to HTML")
     except subprocess.CalledProcessError as e:
         print(f"Error knitting QMD file to HTML: {e}")
-
-
-def raw_url_newsletter(number, branch='main'):
-    """
-    Function to get url of raw Qmd files of a newsletter on SSPHub repo
-
-    Arg :
-        number: number of the newsletter
-        branch: branch of the repo to look for
-
-    Returns:
-        (string) Url to raw Qmd newsletter
-    """
-    return f"https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/{branch}/infolettre/infolettre_{number}/index.qmd"
-
-
-def published_url_newsletter(number):
-    """
-    Function to generate url of published newsletter on SSPHub website
-
-    Arg :
-        number: number of the newsletter
-
-    Returns:
-        url to ssphub website of the given newsletter
-        Output format: a string
-
-    Example:
-        >>> published_url_newsletter('19')
-        'https://ssphub.netlify.app/infolettre/infolettre_19/'
-    """
-    return f"https://ssphub.netlify.app/infolettre/infolettre_{number}/"
 
 
 def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch='main'):
@@ -279,30 +167,6 @@ def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch='main'):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching contents from GitHub API: {e}")
         return None
-
-
-def list_image_files_for_newsletter(number, branch='main'):
-    """
-    Wrapper of list_raw_image_files. List image files present in the github folder InseeFrLab, repo ssphub. Ima
-
-    Arg :
-        number of the newsletter
-        branch where the newsletter is (main by default)
-
-    Returns:
-        list of path to the raw images files
-
-    Example:
-        >>> list_image_files_for_newsletter('19', branch='main')
-        ['https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png',
-        'https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/measles-cases-historical-us-states-heatmap.png']
-
-    """
-    repo_owner = 'InseeFrLab'
-    repo_name = 'ssphub'
-    subfolder_path = f'infolettre/infolettre_{number}'
-
-    return list_raw_image_files(repo_owner, repo_name, subfolder_path, branch)
 
 
 def download_file(file_url, output_dir='.temp', headers=None):
@@ -384,6 +248,227 @@ def unzip_dir(zip_file_path, extraction_dir):
     print(f"Files extracted to {extraction_dir}")
 
 
+
+def remove_files_dir(*file_paths):
+    """
+    Remove files or folder
+
+    Args:
+        file_paths (string) : List of files or folder to delete
+
+    Return:
+        None
+
+    Example:
+        >>> remove_files_dir('.temp/')
+        ('.temp/',) have been removed
+    """
+    for file_path in file_paths:
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            os.remove(file_path)
+        elif os.path.exists(file_path) and os.path.isdir(file_path):
+            shutil.rmtree(file_path)
+    print(f'{file_paths} have been removed')
+
+
+##########################################################################################
+### Newsletter tools
+##########################################################################################
+
+def generate_eml_file(email_body, subject, bcc_recipient, to_recipient='EMAIL_SSPHUB', cc_recipient='', from_sender=None):
+    """
+    Creates an .eml file and saves it to .temp/email.eml
+
+    Args:
+        email_body (string): html body of the email
+        subject (string): Object of the email
+        bcc_recipient (string): list of recipients of the emails to put in bcc
+        to_recipient (string): Email of the sender to indicate (be cautious, it doesn't automate the sending)
+        The email will be sent to himself
+        cc_recipient (string): list of recipients of the emails to be put in cc
+        from_sender(string or None): email adresses to send from. If None, default Outlook
+
+    Returns:
+        None
+    Nb : create the email to .temp/email.eml with a message
+
+    Example:
+        >>> generate_eml_file('body', 'this an email', 'test@test.fr')
+    Email saved as .temp/email.eml
+    """
+    msg = MIMEMultipart()
+    msg['Subject'] = subject
+    msg['BCC'] = bcc_recipient
+    msg['CC'] = cc_recipient
+    msg['To'] = to_recipient   # Auto send the email
+    if from_sender is not None:
+        msg['From'] = from_sender  # Set the sender's email address
+    msg['X-Unsent'] = '1'  # Mark the email as unsent : when the file is opened, it can be sent.
+
+    # Attach the HTML body
+    msg.attach(MIMEText(email_body, 'html'))
+
+    # Save the email as an .eml file
+    eml_file_path = '.temp/email.eml'
+
+    # Create the output directory if it doesn't exist
+    os.makedirs('.temp', exist_ok=True)
+
+    with open(eml_file_path, 'wb') as f:
+        f.write(msg.as_bytes())
+
+    print(f"Email saved as {eml_file_path}")
+
+
+def process_qmd_file_for_email(qmd_content, qmd_output_file, newsletter_url='https://ssphub.netlify.app/infolettre/'):
+    """
+    Transform a newsletter qmd file to a qmd file that will be knitted by
+    calling the function to transform the yaml part of the qmd file
+
+    Args:
+        qmd_content (string): the original qmd file to process, typically the result of fetch_qmd_file
+        qmd_output_file (string): the path of the qmd file to write
+        newsletter_url (string): to pass the argument onto yaml to insert link to newsletter
+
+    Returns:
+        None
+    Nb : writes the processed qmd file
+
+    Example:
+        >>> process_qmd_file_for_email(
+    fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd'),
+    'cleaned_index.qmd')
+    """
+
+    # qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd')
+    # Split the YAML header and the HTML content
+    parts = qmd_content.split('---', 2)
+    if len(parts) < 3:
+        print("Invalid .qmd file format")
+        return None
+
+    yaml_header = parts[1]
+    html_content = parts[2]
+
+    # Clean the YAML header
+    cleaned_yaml_header = clean_yaml_header_for_email(yaml_header, newsletter_url)
+
+    # Combine the cleaned YAML header and HTML content
+    processed_qmd_content = f"---\n{cleaned_yaml_header}---\n{html_content}"
+
+    # Save the processed QMD content to a file
+    with open(qmd_output_file, 'w', encoding='utf-8') as f:
+        f.write(processed_qmd_content)
+
+
+def clean_yaml_header_for_email(yaml_header, newsletter_url):
+    """
+    Function to transform Yaml header of an index.qmd file and transform it for a qmd file that will be
+    knitted to html. It keeps only title, updates the description with the link to the website,
+    add lang, format and format options, including a css file.
+
+    Arg :
+        yaml_header: input yaml_header to clean, as string
+        newsletter_url: url of the newsletter to insert a link to that newsletter
+
+    Returns:
+        (string, with Unicode formating) url to raw Qmd newsletter
+
+    Example:
+        >>> clean_yaml_header_for_email(
+            '\ntitle: "La rentrée 2025:"\n\ndescription: |\n  Infolettre de __Septembre 2025__
+            \n\n# Date published\ndate: \'2025-09-29\'\nnumber: 19\n\nauthors:\n  - Nicolas\n\nimage: mage.png\n\ntags:\n
+            - datavis\n  - IA \n\ncategories:\n  - Infolettre\n\n',
+            'https://ssphub.netlify.app/infolettre/'
+            )
+        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../newsletter_tools/email/css/style.css\n"
+
+    """
+
+    # Parse the YAML header1
+    yaml_data = yaml.safe_load(yaml_header)
+
+    # Keep only the specified keys
+    # We put the link
+    description = ("*" + yaml_data.get('description', '').strip() +
+                " disponible sur le site du [réseau](" + newsletter_url + ")*"
+                )
+
+    cleaned_yaml = {
+        'title': yaml_data.get('title', '').strip(),
+        'description': description
+                }
+
+    # Add missing params
+    cleaned_yaml['lang'] = 'fr'
+    cleaned_yaml['format'] = {
+        'html': {
+            'self-contained': True,  # To have images inside the email
+            'css': '../newsletter_tools/email/css/style.css'
+            }
+        }
+
+    # Convert the cleaned YAML back to a string
+    cleaned_yaml_str = yaml.dump(cleaned_yaml, sort_keys=False,  allow_unicode=True, width=4096)
+    return cleaned_yaml_str
+
+
+def raw_url_newsletter(number, branch='main'):
+    """
+    Function to get url of raw Qmd files of a newsletter on SSPHub repo
+
+    Arg :
+        number: number of the newsletter
+        branch: branch of the repo to look for
+
+    Returns:
+        (string) Url to raw Qmd newsletter
+    """
+    return f"https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/{branch}/infolettre/infolettre_{number}/index.qmd"
+
+
+def published_url_newsletter(number):
+    """
+    Function to generate url of published newsletter on SSPHub website
+
+    Arg :
+        number: number of the newsletter
+
+    Returns:
+        url to ssphub website of the given newsletter
+        Output format: a string
+
+    Example:
+        >>> published_url_newsletter('19')
+        'https://ssphub.netlify.app/infolettre/infolettre_19/'
+    """
+    return f"https://ssphub.netlify.app/infolettre/infolettre_{number}/"
+
+
+def list_image_files_for_newsletter(number, branch='main'):
+    """
+    Wrapper of list_raw_image_files. List image files present in the github folder InseeFrLab, repo ssphub. Ima
+
+    Arg :
+        number of the newsletter
+        branch where the newsletter is (main by default)
+
+    Returns:
+        list of path to the raw images files
+
+    Example:
+        >>> list_image_files_for_newsletter('19', branch='main')
+        ['https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png',
+        'https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/measles-cases-historical-us-states-heatmap.png']
+
+    """
+    repo_owner = 'InseeFrLab'
+    repo_name = 'ssphub'
+    subfolder_path = f'infolettre/infolettre_{number}'
+
+    return list_raw_image_files(repo_owner, repo_name, subfolder_path, branch)
+
+
 def download_images_for_newsletter(number, branch='main', output_dir='.temp'):
     """
     Download all image files from given newsletter number and branch and store it in output_dir
@@ -452,7 +537,7 @@ def generate_email(number,
     download_images_for_newsletter(number, branch, '.temp')
 
     qmd_content = fetch_qmd_file(raw_url_newsletter(number, branch))
-    process_qmd_file(qmd_content, temp_file_qmd, published_url_newsletter(number))
+    process_qmd_file_for_email(qmd_content, temp_file_qmd, published_url_newsletter(number))
     knit_to_html(temp_file_qmd)
 
     with open(temp_file_html, 'r', encoding="utf-8") as f:
@@ -460,26 +545,6 @@ def generate_email(number,
 
     if drop_temp:
         remove_files_dir(temp_file_qmd, temp_file_html)
-
-
-def get_dinum_grist_login(doc_grist_id):
-    """
-    Send back GRIST API login details
-
-    Args:
-        None
-
-    Returns:
-        A GristDocAPI object
-    """
-    # Log in to GRIST API
-    SERVER = "https://grist.numerique.gouv.fr/"
-
-    if 'GRIST_API_KEY' not in os.environ:
-        raise ValueError("The GRIST_API_KEY environment variable does not exist.")
-
-    # Returning API details connection
-    return GristDocAPI(doc_grist_id, server=SERVER)
 
 
 def get_directory_as_df():
@@ -594,6 +659,10 @@ def delete_email_from_contact_table(file_path):
     print('Emails supprimés de la table Contact \n')
 
 
+############################################################################
+### Part to merge two websites
+############################################################################
+
 def clean_br_values_df(df):
     """
     Replace the /n by HTML <br> mark up or nothing for columns who will end up in a Md table/YAML part
@@ -666,40 +735,6 @@ def fill_template(path_to_template, df, directory_output='newsletter_tools'):
         print(f'File written at {output_file_path}')
 
     return template_content
-
-
-def fetch_grist_table_as_pl(doc_grist_id, table_id):
-    """
-    Get a grist table as a polar dataframe. It transforms Grist records :
-    - If the value is a list (not a tuple) and the first element is 'L', we want an
-      array of all elements 1...end
-    
-    Args:
-        doc_grist_id : id of the grist document 
-        table_id (string) : id of the Grist table
-    
-    Return: 
-        A pl dataframe
-    """
-    grist_api = get_dinum_grist_login(doc_grist_id)
-    table_grist_records = grist_api.fetch_table(table_id)
-    table_dict = [record._asdict() for record in table_grist_records]
-    
-    # Cleaning Grist lists - causes a pb with polars. from 
-    # https://github.com/uaw-union/sheets-parquet-server/blob/19acaa3ef9ab65f9229b3df5e7007b8cc1fffca0/src/main.py#L4
-    transformed_records = [
-        {
-            k: (
-                ';'.join([str(s) for s in v])
-                if isinstance(v, list) and len(v)>0
-                else v
-            )
-            for k, v in d.items()
-        }
-        for d in table_dict
-    ]
-
-    return pl.DataFrame(transformed_records, infer_schema_length=None)
 
 
 def get_grist_merge_as_df():
@@ -839,27 +874,6 @@ def fill_all_templates_from_grist(path_to_template='newsletter_tools/fusion_site
     # Cleaning intermediate data
     remove_files_dir(unzip_dir_path, temp_dir+grist_attach_filename)
 
-
-def remove_files_dir(*file_paths):
-    """
-    Remove files or folder
-
-    Args:
-        file_paths (string) : List of files or folder to delete
-
-    Return:
-        None
-
-    Example:
-        >>> remove_files_dir('.temp/')
-        ('.temp/',) have been removed
-    """
-    for file_path in file_paths:
-        if os.path.exists(file_path) and os.path.isfile(file_path):
-            os.remove(file_path)
-        elif os.path.exists(file_path) and os.path.isdir(file_path):
-            shutil.rmtree(file_path)
-    print(f'{file_paths} have been removed')
 
 
 if __name__ == '__main__':
