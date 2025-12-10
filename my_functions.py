@@ -490,14 +490,14 @@ def get_directory_as_df():
         None
 
     Returns:
-        A pl.DataFrame with three columns : ['email', 'Supprimez_mon_compte', 'nom', 'Nom_domaine']
+        A pl.DataFrame with three columns : ['Email', 'Supprimez_mon_compte', 'Nom', 'Nom_domaine']
     """
     # fetch all the rows
     directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
     
     # Selecting minimum set of columns
     cols_to_keep = [
-        'email', 'Supprimez_mon_compte', 'nom', 'Nom_domaine'
+        'Email', 'Supprimez_mon_compte', 'Nom', 'Nom_domaine'
         ]
     
     directory_df = directory_df.select(cols_to_keep)
@@ -518,12 +518,12 @@ def get_emails():
     """
     my_directory_df = get_directory_as_df()
     my_directory_df = (my_directory_df.filter(pl.col('Supprimez_mon_compte') == False)
-                                      .sort(['Nom_domaine', 'nom'])
+                                      .sort(['Nom_domaine', 'Nom'])
                                       )
     # Turning emails from myemail@example.com to <myemail@example.com>
-    my_directory_df.with_columns('<' + pl.col('email') + '>')
+    my_directory_df.with_columns('<' + pl.col('Email') + '>')
     # Joining all emails into one string '<myemail@example.com>; <myemail2@example.com>'
-    return '; '.join(my_directory_df['email'])
+    return '; '.join(my_directory_df['Email'])
 
 
 def extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt'):
@@ -566,10 +566,10 @@ def get_ids_of_email(emails_list):
     """
     # Get the latest GRIST directory
     directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
-    directory_df = directory_df.select(['id', 'email'])
+    directory_df = directory_df.select(['id', 'Email'])
 
     # Filter the emails
-    res = directory_df.filter(pl.col('email').is_in(emails_list))
+    res = directory_df.filter(pl.col('Email').is_in(emails_list))
     res = pl.Series(res.select(pl.col('id'))).to_list()
 
     return res

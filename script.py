@@ -4,18 +4,20 @@ import importlib  # To reload package
 import os
 
 # To generate email
-newsletter_nb = 20
+newsletter_nb = 21
+email_object = "[SSPHub] Infolettre de décembre"
+
 ## Validation
 my_f.generate_email(
     newsletter_nb,
     'newsletter_'+str(newsletter_nb),
-    "Pour validation - infolettre d'octobre du SSPHub",
+    "Pour validation - " + email_object,
     os.environ['EMAIL_VALIDATION_TO'],
     email_bcc='',
     email_from=None,
     email_cc=os.environ['EMAIL_VALIDATION_CC']+";"+os.environ['EMAIL_SSPHUB'])
-## Send to all
-my_f.generate_email(newsletter_nb, 'main', "[SSPHub] Infolettre d'octobre", os.environ['EMAIL_SSPHUB'], my_f.get_emails())
+## Once cleared, accept the PR. Once PR done, send to all
+my_f.generate_email(newsletter_nb, 'main', email_object, os.environ['EMAIL_SSPHUB'], my_f.get_emails()+ os.environ['EMAIL_CCI_SSM_MANGMT_INSEE'])
 
 ## Treat replies
 my_f.delete_email_from_contact_table(file_path='newsletter_tools/input/replies.txt')
