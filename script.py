@@ -17,7 +17,7 @@ my_f.generate_email(
     email_from=None,
     email_cc=os.environ['EMAIL_VALIDATION_CC']+";"+os.environ['EMAIL_SSPHUB'])
 ## Once cleared, accept the PR. Once PR done, send to all
-my_f.generate_email(newsletter_nb, 'main', email_object, os.environ['EMAIL_SSPHUB'], my_f.get_emails()+ os.environ['EMAIL_CCI_SSM_MANGMT_INSEE'])
+my_f.generate_email(newsletter_nb, 'main', email_object, os.environ['EMAIL_SSPHUB'], my_f.get_emails())
 
 ## Treat replies
 my_f.delete_email_from_contact_table(file_path='newsletter_tools/input/replies.txt')

@@ -549,25 +549,39 @@ def generate_email(number,
 
 def get_directory_as_df():
     """
-    Fetch back direcory of SSPHUB as a pl dataframe
+    Fetch back direcory of SSPHUB and management as a pl dataframe
 
     Args:
         None
 
     Returns:
-        A pl.DataFrame with three columns : ['Email', 'Supprimez_mon_compte', 'Nom', 'Nom_domaine']
+        A pl.DataFrame with three columns : ['Email', 'Nom', 'Nom_domaine', 'Supprimez_mon_compte']
     """
-    # fetch all the rows
+    # fetch all the rows of general enlisted persons
     directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
     
-    # Selecting minimum set of columns
+    # Selecting set of columns
     cols_to_keep = [
-        'Email', 'Supprimez_mon_compte', 'Nom', 'Nom_domaine'
+        'Email',  'Nom', 'Nom_domaine', 'Supprimez_mon_compte'
         ]
     
     directory_df = directory_df.select(cols_to_keep)
 
-    return directory_df
+    # Fetching data for management
+    # Selecting set of columns
+    cols_to_keep = [
+        'Email', 'Nom', 'Nom_domaine'
+        ]
+    
+    directory_df_mngmt = (
+        fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Encadrement_SSMs')
+        .select(cols_to_keep)
+        .with_columns(
+            Supprimez_mon_compte=False
+        )
+    )
+
+    return pl.concat([directory_df, directory_df_mngmt])
 
 
 def get_emails():
@@ -583,6 +597,7 @@ def get_emails():
     """
     my_directory_df = get_directory_as_df()
     my_directory_df = (my_directory_df.filter(pl.col('Supprimez_mon_compte') == False)
+                                      .unique(subset="Email")
                                       .sort(['Nom_domaine', 'Nom'])
                                       )
     # Turning emails from myemail@example.com to <myemail@example.com>
