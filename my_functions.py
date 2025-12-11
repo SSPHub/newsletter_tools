@@ -635,7 +635,7 @@ def extract_emails_from_txt(file_path='newsletter_tools/test/replies.txt'):
 
 def get_ids_of_email(emails_list):
     """
-    Return the ids of the rows of the email in the GRIST directory
+    Return the ids of the rows of the email in the GRIST directory. Will return a list of length 0 if an email is not in the list.
 
     Args:
         emails_list (list) : a list of strings, containing the emails to look for in df
@@ -643,6 +643,9 @@ def get_ids_of_email(emails_list):
     Returns:
         list: A list of ids of the rows in df
 
+    Example: 
+        >>> get_ids_of_email(['test1@insee.fr', 'test2@insee.fr'])
+        []
     """
     # Get the latest GRIST directory
     directory_df = fetch_grist_table_as_pl(os.environ['GRIST_SSPHUB_DIRECTORY_ID'], 'Contact')
@@ -667,10 +670,9 @@ def delete_email_from_contact_table(file_path):
     """
     emails_list = extract_emails_from_txt(file_path)
     print(str(len(emails_list)) + ' emails extraits du fichier: ', emails_list)
-    print()
-    emails_id = get_ids_of_email('Contact', emails_list)
+    emails_id = get_ids_of_email(emails_list)
     print(str(len(emails_id)) + ' emails trouvés dans la table Contact \n')
-    get_grist_directory_login().delete_records('Contact', emails_id)
+    get_dinum_grist_login(os.environ['GRIST_SSPHUB_DIRECTORY_ID']).delete_records('Contact', emails_id)
     print('Emails supprimés de la table Contact \n')
 
 
