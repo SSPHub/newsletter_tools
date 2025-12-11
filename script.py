@@ -1,5 +1,5 @@
-import newsletter_tools.my_functions  as my_f
-import importlib  # To reload package
+import newsletter_tools.my_functions as my_f
+# import importlib  # To reload package
 # importlib.reload(my_f)  # When functions are updated
 import os
 
@@ -20,7 +20,7 @@ my_f.generate_email(
 my_f.generate_email(newsletter_nb, 'main', email_object, os.environ['EMAIL_SSPHUB'], my_f.get_emails())
 
 ## Treat replies
-my_f.delete_email_from_contact_table(file_path='newsletter_tools/input/replies.txt')
+my_f.delete_email_from_contact_table(file_path='newsletter_tools/replies.txt')
 
 # To generate template
 # my_f.remove_files_dir('ssphub/project/test')
