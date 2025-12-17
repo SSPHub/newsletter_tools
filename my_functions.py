@@ -25,6 +25,7 @@ import zipfile  # GRIST attachments
 ### Common tools 
 ##########################################################################################
 
+
 def fetch_grist_table_as_pl(doc_grist_id, table_id):
     """
     Get a grist table as a polar dataframe. It transforms Grist records :
@@ -123,6 +124,43 @@ def knit_to_html(processed_qmd_file):
         print(f"Error knitting QMD file to HTML: {e}")
 
 
+def list_raw_files(repo_owner, repo_name, subfolder_path, branch='main'):
+    """
+    List files and folder present in a given github folder. 
+
+    Arg :
+        repo_owner : name of the owner of the repo in Github
+        repo_name : name of the Github repo
+        subfolder_path : in the given repo architecture, a subfolder path to the folder where you want to list all files.
+    For example : infolettre/infolettre_19/
+        branch where the newsletter is (main by default)
+
+    Returns:
+        url to the raw files
+        Output format: a list of strings
+
+    Example:
+        >>> list_raw_files('InseeFrLab', 'ssphub', 'infolettre/infolettre_19', branch='main')
+        [{'name': '2025_09_back_school.png', 'path': 'infolettre/infolettre_19/2025_09_back_school.png',
+        'sha': 'd2efaee464a794eba9f31f68068f95198e77c777', 'size': 1492220, 'url': 'https://api.github.com/
+        repos/InseeFrLab/ssphub/contents/infolettre/infolettre_19/2025_09_back_school.png?ref=main', ...]
+    """
+    # GitHub API URL to list contents of a subfolder
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{subfolder_path}?ref={branch}"
+
+    try:
+        # Send a GET request to the GitHub API
+        response = requests.get(url)
+        response.raise_for_status()  # Raise an exception for HTTP errors
+
+        # Parse the JSON response
+        return response.json()
+
+    except requests.exceptions.RequestException as e:
+        print(f"Error fetching contents from GitHub API: {e}")
+        return None
+
+
 def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch='main'):
     """
     List image files present in a given github folder. Images are defined by the following formats
@@ -145,28 +183,21 @@ def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch='main'):
         'https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/measles-cases-historical-us-states-heatmap.png']
 
     """
-    # GitHub API URL to list contents of a subfolder
-    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/contents/{subfolder_path}?ref={branch}"
+    # Get the file lists
+    contents = list_raw_files(
+        repo_owner=repo_owner, 
+        repo_name=repo_name, 
+        subfolder_path=subfolder_path, 
+        branch=branch)
 
-    try:
-        # Send a GET request to the GitHub API
-        response = requests.get(url)
-        response.raise_for_status()  # Raise an exception for HTTP errors
+    # Filter image files (assuming common image extensions)
+    image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}
+    image_files = [
+        f'https://raw.githubusercontent.com/{repo_owner}/{repo_name}/refs/heads/{branch}/{item['path']}' for item in contents
+        if item['type'] == 'file' and os.path.splitext(item['name'])[1].lower() in image_extensions
+    ]
 
-        # Parse the JSON response
-        contents = response.json()
-
-        # Filter image files (assuming common image extensions)
-        image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.svg', '.webp'}
-        image_files = [
-            f'https://raw.githubusercontent.com/{repo_owner}/{repo_name}/refs/heads/{branch}/{item['path']}' for item in contents
-            if item['type'] == 'file' and os.path.splitext(item['name'])[1].lower() in image_extensions
-        ]
-
-        return image_files
-    except requests.exceptions.RequestException as e:
-        print(f"Error fetching contents from GitHub API: {e}")
-        return None
+    return image_files
 
 
 def download_file(file_url, output_dir='.temp', headers=None):
