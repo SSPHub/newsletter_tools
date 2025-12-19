@@ -4,15 +4,15 @@ from newsletter_tools.my_functions import *
 repo_owner = 'InseeFrLab'
 repo_name='ssphub'
 subfolder_path='project'
-branch='fusion_site_ssplab'
+branch='review_project'
 
 # Fetch all folder from Github, defining weblink 
 # pl.DataFrame(list_raw_files(repo_owner, repo_name, subfolder_path, branch)).filter(type='dir').unnest('_links').head(1).glimpse()
-df = pl.DataFrame(list_raw_files(repo_owner, repo_name, subfolder_path, branch)).filter(type='dir').unnest('_links').select('name', 'html')
-df = df.with_columns(
+df_raw = pl.DataFrame(list_raw_files(repo_owner, repo_name, subfolder_path, branch)).filter(type='dir').unnest('_links').select('name', 'html')
+df = df_raw.with_columns(
     qmd_file=pl.col.html+'/index.qmd', 
     qmd_file_raw='https://raw.githubusercontent.com/'+repo_owner+'/'+repo_name+'/'+branch+'/'+subfolder_path+'/'+pl.col.name+'/index.qmd', 
-    weblink='https://inseefrlab.github.io/ssphub/pr-preview/pr-112/'+subfolder_path+'/'+pl.col.name
+    weblink='https://inseefrlab.github.io/ssphub/pr-preview/pr-124/'+subfolder_path+'/'+pl.col.name
 )
 
 # Fetching doc metadata from YAML headers of the files
