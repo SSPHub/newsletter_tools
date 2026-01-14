@@ -6,7 +6,7 @@ description: "{{my_yaml_description}}"
 
 format: html
 
-authors: 
+authors:
 {{my_yaml_authors}}
 
 # Date published
@@ -15,17 +15,16 @@ date: {{my_yaml_date}}
 # Date updated
 image: {{my_yaml_image_path}}
 
-categories : 
+categories :
 {{my_yaml_categories}}
 
 ---
 
-# Synthèse du projet
+# Synthèse du project
 
 |              | {{my_table_title}}                           |
 |--------------|------------------------------------------------------------------------------------|
-| **Détail du projet**         | {{my_table_details}}         |
+| **Détail du project**         | {{my_table_details}}         |
 | **Acteurs**                  | {{my_table_actors}}         |
-| **Résultats du projet**      | {{my_table_results}}         |
-| **Code du projet**           | {{my_table_repo_path}}       |
-
+| **Résultats du project**      | {{my_table_results}}         |
+| **Code du project**           | {{my_table_repo_path}}       |
