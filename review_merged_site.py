@@ -1,4 +1,7 @@
-from newsletter_tools.my_functions import *
+import newsletter_tools.my_functions as myf
+import polars as pl
+import yaml
+import os
 
 # Params
 repo_owner = "InseeFrLab"
@@ -7,9 +10,9 @@ subfolder_path = "project"
 branch = "review_project"
 
 # Fetch all folder from Github, defining weblink
-# pl.DataFrame(list_raw_files(repo_owner, repo_name, subfolder_path, branch)).filter(type='dir').unnest('_links').head(1).glimpse()
+# pl.DataFrame(myf.list_raw_files(repo_owner, repo_name, subfolder_path, branch)).filter(type='dir').unnest('_links').head(1).glimpse()
 df_raw = (
-    pl.DataFrame(list_raw_files(repo_owner, repo_name, subfolder_path, branch))
+    pl.DataFrame(myf.list_raw_files(repo_owner, repo_name, subfolder_path, branch))
     .filter(type="dir")
     .unnest("_links")
     .select("name", "html")
@@ -39,7 +42,7 @@ prez = [
     pl.DataFrame(
         {
             "qmd_file_raw": qmd_file_raw,
-            "yaml_dic": yaml.safe_load(fetch_qmd_file(qmd_file_raw).split("---", 2)[1]),
+            "yaml_dic": yaml.safe_load(myf.fetch_qmd_file(qmd_file_raw).split("---", 2)[1]),
         },
         strict=False,
     ).unnest("yaml_dic")
@@ -47,7 +50,7 @@ prez = [
 ]
 prez = [
     df.select(["qmd_file_raw", "title", "description", "categories"]) for df in prez
-]  # bcs polars doesnt like different data types / new columns ...
+]  # bcs polars does not like different data types / new columns ...
 df = df.join(pl.concat(prez, how="diagonal_relaxed"), on="qmd_file_raw")
 
 # Preparing posting to Grist table
@@ -68,6 +71,6 @@ df_grist = (
 )
 
 # Add records to grist table
-get_dinum_grist_login(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).add_records(
+myf.get_dinum_grist_login(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).add_records(
     "Retours", df_grist.to_dicts()
 )

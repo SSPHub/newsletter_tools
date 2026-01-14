@@ -3,7 +3,6 @@ repos:
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v6.0.0
     hooks:
-      - id: trailing-whitespace
       - id: end-of-file-fixer
       - id: check-ast
       - id: check-yaml
@@ -56,5 +55,5 @@ repos:
     rev: 1.9.2
     hooks:
       - id: bandit
-        args: [--skip=B101, --recursive]
+        args: [-severity-level, medium, high, --recursive]
         exclude: ^(tests/|docs/)

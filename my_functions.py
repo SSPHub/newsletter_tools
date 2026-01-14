@@ -96,7 +96,7 @@ def fetch_qmd_file(url):
     __Septembre 2025__\n\n# Date published\ndate: \'2025-09-29\'\nnumber: 19\n\nauthors:\n ......'
     """
     try:
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()
         return response.text
     except requests.exceptions.RequestException as e:
@@ -153,7 +153,7 @@ def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
 
     try:
         # Send a GET request to the GitHub API
-        response = requests.get(url)
+        response = requests.get(url, timeout=10)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
         # Parse the JSON response
@@ -216,7 +216,7 @@ def download_file(file_url, output_dir=".temp", headers=None):
 
     Returns:
         file_name (str): name of the downloaded file
-        print if download was successfull
+        print if download was successful
 
     Example:
         >>> download_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png')
@@ -226,7 +226,7 @@ def download_file(file_url, output_dir=".temp", headers=None):
 
     try:
         # Send a GET request to the GitHub API
-        response = requests.get(file_url, headers=headers)
+        response = requests.get(file_url, headers=headers, timeout=10)
         response.raise_for_status()  # Raise an exception for HTTP errors
 
         # Create the output directory if it doesn't exist
@@ -335,7 +335,7 @@ def generate_eml_file(
         to_recipient (string): Email of the sender to indicate (be cautious, it doesn't automate the sending)
         The email will be sent to himself
         cc_recipient (string): list of recipients of the emails to be put in cc
-        from_sender(string or None): email adresses to send from. If None, default Outlook
+        from_sender(string or None): email addresses to send from. If None, default Outlook
 
     Returns:
         None
@@ -427,7 +427,7 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
         newsletter_url: url of the newsletter to insert a link to that newsletter
 
     Returns:
-        (string, with Unicode formating) url to raw Qmd newsletter
+        (string, with Unicode formatting) url to raw Qmd newsletter
 
     Example:
         >>> clean_yaml_header_for_email(
@@ -541,7 +541,7 @@ def download_images_for_newsletter(number, branch="main", output_dir=".temp"):
 
     Returns:
         nothing
-        nb : a message is printed if download was successfull
+        nb : a message is printed if download was successful
 
     Example:
         >>> download_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png')
@@ -580,10 +580,10 @@ def generate_email(
         number (string): number of the newsletter to turn into email
         branch (string): repo branch of the newsletter to turn into email (main for published newsletter, other for non published newsletters)
         email_object (string): object of the email
-        email_to (string) : list of email adresses to send the email to
-        email_bcc (string) : list of email adresses to be in bcc
+        email_to (string) : list of email addresses to send the email to
+        email_bcc (string) : list of email addresses to be in bcc
         email_from(string) : sender to see in Outlook. None for default sender
-        email_cc (string) : list of email adresses to be in cc
+        email_cc (string) : list of email addresses to be in cc
         drop_temp (boolean): if temporary knitted files should be removed after knitting. Default is true
 
     Returns:
@@ -621,7 +621,7 @@ def generate_email(
 
 def get_directory_as_df():
     """
-    Fetch back direcory of SSPHUB and management as a pl dataframe
+    Fetch back directory of SSPHUB and management as a pl dataframe
 
     Args:
         None
@@ -871,7 +871,7 @@ def get_grist_merge_as_df():
 
     new_website_df = new_website_df.select(cols_to_keep)
 
-    # Dictionnary for renaming variables / Right part must correspond to template keywords
+    # Dictionary for renaming variables / Right part must correspond to template keywords
     variable_mapping = {
         "Titre": "my_yaml_title",
         "sous_titre": "my_yaml_description",
@@ -936,7 +936,7 @@ def fill_all_templates_from_grist(
     # Cleaning breaks
     pages_df = clean_br_values_df(pages_df)
 
-    # Droping rows with empty nom_dossier and keeping only the one to_update
+    # Dropping rows with empty nom_dossier and keeping only the one to_update
     pages_df = pages_df.filter(pl.col("nom_dossier") != "", pl.col("to_update"))
 
     # Create the index.qmd by calling the function
@@ -986,7 +986,7 @@ def fill_all_templates_from_grist(
             ).alias("dest_image_path")
         )
         .drop_nulls(subset="local_image_path")
-    )  # Droping files where didn't download image
+    )  # Dropping files where didn't download image
 
     # Moving all images to their folder
     for row in pages_df.iter_rows(named=True):
