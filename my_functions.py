@@ -22,7 +22,7 @@ import shutil  # to remove directory and its content
 import zipfile  # GRIST attachments
 
 ##########################################################################################
-### Common tools
+# Common tools
 ##########################################################################################
 
 
@@ -313,7 +313,7 @@ def remove_files_dir(*file_paths):
 
 
 ##########################################################################################
-### Newsletter tools
+# Newsletter tools
 ##########################################################################################
 
 
@@ -667,7 +667,7 @@ def get_emails():
     """
     my_directory_df = get_directory_as_df()
     my_directory_df = (
-        my_directory_df.filter(pl.col("Supprimez_mon_compte") == False)
+        my_directory_df.filter(~pl.col("Supprimez_mon_compte"))  # ~ is equivalent to not
         .unique(subset="Email")
         .sort(["Nom_domaine", "Nom"])
     )
@@ -752,7 +752,7 @@ def delete_email_from_contact_table(file_path):
 
 
 ############################################################################
-### Part to merge two websites
+# Part to merge two websites
 ############################################################################
 
 
