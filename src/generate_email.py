@@ -1,7 +1,7 @@
 from src.email.prep import download_images_for_newsletter
 from src.email.knit import process_qmd_file_for_email, knit_to_html
 from src.email.generate import generate_eml_file
-from src.github.extract import fetch_qmd_file
+from src.github.extract import fetch_qmd_file, raw_url_newsletter, published_url_newsletter
 from src.utils.files import remove_files_dir
 
 def generate_email(
