@@ -1,4 +1,6 @@
-import newsletter_tools.my_functions as my_f
+import src.main as my_f
+import src.directory.replies as post_tr
+import os
 
 # import importlib  # To reload package
 # importlib.reload(my_f)  # When functions are updated
@@ -30,10 +32,5 @@ my_f.generate_email(
 )
 
 # ## Treat replies
-# my_f.delete_email_from_contact_table(file_path="newsletter_tools/replies.txt")
+# post_tr.delete_email_from_contact_table(file_path="newsletter_tools/replies.txt")
 
-# To generate template
-# my_f.remove_files_dir('ssphub/project/test')
-# my_f.fill_all_templates_from_grist()
-
-# my_f.fill_all_templates_from_grist('newsletter_tools/fusion_site/template.qmd', directory='ssphub/project')

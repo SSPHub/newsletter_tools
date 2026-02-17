@@ -28,7 +28,7 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - `cd newsletter_tools`
   - Faire `uv sync`
   - Set interpreter path : F1 in VS Code and then select interpreter and choose newsletter_tools/.venv/bin/python / ou source .venv/bin/activate ?
-  - go to script to generate email for validation
+  - go to script to generate email for validation / use uv run main.py
   - download email
   - add text to say It's the newsletter for clearance
   - send it

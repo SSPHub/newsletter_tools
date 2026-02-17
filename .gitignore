@@ -3,14 +3,15 @@
 *.html
 res.qmd
 
+# Email data
+*.txt
+
 # Test
 2023_Enquete_Budget_Famille/
 test/*.txt
-!test/replies.txt
+!src/test/replies.txt
 test/*.qmd
 
-# Email data
-*.txt
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

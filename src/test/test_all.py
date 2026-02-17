@@ -1,9 +1,15 @@
-from newsletter_tools.my_functions import *
-import time  # for pausing code execution
+import os
+from src.generate_email import generate_email
+from src.directory.replies import extract_emails_from_txt, get_ids_of_email
+from src.directory.extract import get_emails, get_directory_as_df
+from src.merge.merge import fill_template, get_grist_merge_as_df, fill_all_templates_from_grist
+from src.utils.grist_api import GristApi
+from src.utils.files import download_file, unzip_dir, remove_files_dir
+import polars as pl
 
 
 def test_fetch_grist():
-    fetch_grist_table_as_pl(get_grist_merge_website_login(), "Intranet_details")
+    GristApi(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).fetch_table_pl("Intranet_details")
 
 
 def test_generate_email():
@@ -37,7 +43,7 @@ def write_test_data():
         "Contact me at test4@example.com for assistance.\n",  # Email in the middle of a sentence
     ]
 
-    with open("newsletter_tools/test/replies.txt", mode="w") as file:
+    with open("src/test/replies.txt", mode="w") as file:
         file.writelines(lines)
 
 
@@ -45,7 +51,7 @@ def test_extract_emails():
     write_test_data()
     # Test function
     assert "test9@example.com" in extract_emails_from_txt(
-        file_path="newsletter_tools/test/replies.txt"
+        file_path="src/test/replies.txt"
     )
 
 
@@ -74,14 +80,14 @@ def test_fill_template_one_row():
     )
 
     fill_template(
-        "newsletter_tools/fusion_site/template.qmd", df, "newsletter_tools/test"
+        "newsletter_tools/src/merge/fusion_site/template.qmd", df, "newsletter_tools/test"
     )
 
 
 def test_fill_template_two_rows():
     new_website_df = get_grist_merge_as_df()
     fill_template(
-        "newsletter_tools/fusion_site/template.qmd",
+        "newsletter_tools/src/merge/fusion_site/template.qmd",
         new_website_df.head(2),
         "newsletter_tools/test",
     )
@@ -102,8 +108,9 @@ def test_update_polars2():
 
 
 def test_grist_attachment_download():
-    url = get_grist_attachments_config()[0]
-    headers = get_grist_attachments_config()[1]
+    api_config = GristApi(os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID'])
+    url = api_config.attachment_url
+    headers = api_config.headers
 
     download_file(url, output_dir=".temp/", headers=headers)
     unzip_dir(".temp/Fusion_site_SSPHub-Attachments.zip", ".temp/extracted_data")
