@@ -1,30 +1,3 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = [
-#     "email-mime",
-#     "os",
-#     "pyyaml",
-#     "requests",
-#     "grist-api",
-#     "polars",
-# ]
-# ///
-
-from email.mime.multipart import MIMEMultipart  # To generate the draft email
-from email.mime.text import MIMEText  # To generate the draft email
-import requests  # To transform newsletter into email, call Github API and download files
-import yaml  # To update newsletter qmd metadata for the email
-import os  # to remove temporary files, create directory etc
-from grist_api import GristDocAPI  # To get directory emails
-import polars as pl  # to manage directory emails
-import re  # For pattern matching to search for emails
-import shutil  # to remove directory and its content
-import zipfile  # GRIST attachments
-
-##########################################################################################
-# Common tools
-##########################################################################################
-
 
 def fetch_grist_table_as_pl(doc_grist_id, table_id):
     """
@@ -79,14 +52,3 @@ def get_dinum_grist_login(doc_grist_id):
     # Returning API details connection
     return GristDocAPI(doc_grist_id, server=SERVER)
 
-
-
-if __name__ == "__main__":
-    remove_files_dir(".temp/", "newsletter_tools/test/")
-
-    fill_all_templates_from_grist()
-    generate_email(
-        19, "main", "Infolettre de rentrée", "my_to_email@insee.fr", get_emails()
-    )
-
-    remove_files_dir(".temp/", "newsletter_tools/test/")
