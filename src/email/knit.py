@@ -1,3 +1,4 @@
+import yaml
 
 def process_qmd_file_for_email(
     qmd_content,
