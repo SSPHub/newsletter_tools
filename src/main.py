@@ -10,7 +10,6 @@
 # ]
 # ///
 
-from grist_api import GristDocAPI  # To get directory emails
 import polars as pl  # to manage directory emails
 
 
