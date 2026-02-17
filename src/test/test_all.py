@@ -1,4 +1,4 @@
-from newsletter_tools.my_functions import *
+from src import *
 import time  # for pausing code execution
 
 
