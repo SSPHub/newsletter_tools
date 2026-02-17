@@ -1,6 +1,6 @@
 from src import *
 import time  # for pausing code execution
-
+import polars as pl
 
 def test_fetch_grist():
     fetch_grist_table_as_pl(get_grist_merge_website_login(), "Intranet_details")

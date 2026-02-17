@@ -1,4 +1,5 @@
 import os
+import polars as pl
 
 def get_directory_as_df():
     """

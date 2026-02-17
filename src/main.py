@@ -10,8 +10,6 @@
 # ]
 # ///
 
-import polars as pl  # to manage directory emails
-
 
 def generate_email(
     number,
