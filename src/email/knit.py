@@ -1,4 +1,5 @@
 import yaml
+import subprocess
 
 def process_qmd_file_for_email(
     qmd_content,
@@ -116,8 +117,6 @@ def knit_to_html(processed_qmd_file):
     Saves the knitted file with same name as qmd file, same folder
     """
     # Use the Quarto CLI to knit the QMD file to HTML
-    import subprocess
-
     try:
         subprocess.run(
             ["quarto", "render", processed_qmd_file, "--to", "html"], check=True
