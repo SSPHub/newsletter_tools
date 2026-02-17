@@ -1,3 +1,5 @@
+import re  # For pattern matching to search for emails
+
 def extract_emails_from_txt(file_path="newsletter_tools/test/replies.txt"):
     """
     Extract all email addresses from a file that contains all the automatic replies to a newsletter / an email.

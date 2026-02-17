@@ -17,7 +17,6 @@ import yaml  # To update newsletter qmd metadata for the email
 import os  # to remove temporary files, create directory etc
 from grist_api import GristDocAPI  # To get directory emails
 import polars as pl  # to manage directory emails
-import re  # For pattern matching to search for emails
 
 
 
