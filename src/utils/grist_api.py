@@ -14,6 +14,8 @@ class GristApi:
 
         self.table_url = f"{self.doc_url}/{doc_id}/tables"
 
+        self.attachment_url = f"{self.doc_url}/{doc_id}/tables/attachments/archive"
+
         self.headers = {
             "accept": "application/json",
             "Authorization": f"Bearer {os.environ['GRIST_API_KEY']}",

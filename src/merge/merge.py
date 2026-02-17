@@ -136,27 +136,6 @@ def get_grist_merge_as_df():
     return new_website_df
 
 
-def get_grist_attachments_config():
-    """
-    Create API url to fetch attachments
-
-    Arg:
-        None.
-        Environment variables must contain 'SSPHUB_WEBSITE_MERGE_ID' and 'GRIST_API_KEY'
-
-    Returns:
-        tuple with url and headers of the API call
-
-    Example:
-        >>> get_grist_attachments_config()
-        ('https://grist.numerique.gouv.fr/api/docs/SSPHUB_WEBSITE_MERGE_ID/attachments/archive', {'Authorization': 'Bearer GRIST_API_KEY'})
-    """
-    url = f"https://grist.numerique.gouv.fr/api/docs/{os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID']}/attachments/archive"
-    headers = {"Authorization": f"Bearer {os.environ['GRIST_API_KEY']}"}
-
-    return url, headers
-
-
 def fill_all_templates_from_grist(
     path_to_template="newsletter_tools/fusion_site/template.qmd",
     directory="newsletter_tools/test",
@@ -188,8 +167,10 @@ def fill_all_templates_from_grist(
 
     # Download all attachments in GRIST
     # URL set up
-    url = get_grist_attachments_config()[0]
-    headers = get_grist_attachments_config()[1]
+    api_config = GristApi(os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID'])
+    url = api_config.attachment_url
+    headers = api_config.headers
+
     # Destination directory
     temp_dir = ".temp/"
     # Download attachment and store zip file name

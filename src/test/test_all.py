@@ -112,8 +112,9 @@ def test_update_polars2():
 
 
 def test_grist_attachment_download():
-    url = get_grist_attachments_config()[0]
-    headers = get_grist_attachments_config()[1]
+    api_config = GristApi(os.environ['GRIST_SSPHUB_WEBSITE_MERGE_ID'])
+    url = api_config.attachment_url
+    headers = api_config.headers
 
     download_file(url, output_dir=".temp/", headers=headers)
     unzip_dir(".temp/Fusion_site_SSPHub-Attachments.zip", ".temp/extracted_data")
