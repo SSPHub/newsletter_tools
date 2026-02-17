@@ -1,10 +1,11 @@
 import os
 from src.generate_email import generate_email
 from src.directory.replies import extract_emails_from_txt, get_ids_of_email
-from src.directory.extract import get_emails
-from src.directory.extract import get_directory_as_df
-import polars as pl
+from src.directory.extract import get_emails, get_directory_as_df
+from src.merge.merge import fill_template, get_grist_merge_as_df, fill_all_templates_from_grist
 from src.utils.grist_api import GristApi
+from src.utils.files import download_file, unzip_dir, remove_files_dir
+import polars as pl
 
 
 def test_fetch_grist():
