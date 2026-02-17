@@ -1,20 +1,15 @@
-from src.generate_email import *
+import os
+from src.generate_email import generate_email
 from src.directory.replies import extract_emails_from_txt, get_ids_of_email
 from src.directory.extract import get_emails
 from src.directory.extract import get_directory_as_df
-import time  # for pausing code execution
 import polars as pl
-import os
-os.chdir("newsletter_tools")
 from src.utils.grist_api import GristApi
+
 
 def test_fetch_grist():
     GristApi(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).fetch_table_pl("Intranet_details")
 
-# df = GristApi(os.environ['GRIST_SSPHUB_DIRECTORY_ID']).fetch_table_pl("Contact")
-# df.glimpse()
-
-# df.select(pl.col("Comment_as_tu_entendu_parler_de_la_newsletter_").value_counts())
 
 def test_generate_email():
     generate_email(

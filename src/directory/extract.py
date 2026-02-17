@@ -2,6 +2,7 @@ import os
 import polars as pl
 from src.utils.grist_api import GristApi
 
+
 def get_directory_as_df():
     """
     Fetch back directory of SSPHUB and management as a pl dataframe

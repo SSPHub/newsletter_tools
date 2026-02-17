@@ -3,6 +3,7 @@ import os
 import requests
 import polars as pl
 
+
 class GristApi:
     def __init__(self, doc_id=os.environ["GRIST_VEILLE_DOC_ID"]):
         if "GRIST_API_KEY" not in os.environ:
@@ -107,4 +108,3 @@ class GristApi:
             f"{self.table_url}/{table_id}/records/delete", headers=self.headers, **kwarg
         )
         return response
-
