@@ -1,5 +1,6 @@
 import os
 import polars as pl
+from src.utils.grist_api import GristApi
 
 def clean_br_values_df(df):
     """
@@ -93,9 +94,7 @@ def get_grist_merge_as_df():
     [17 rows x 12 columns]
     """
     # fetch all the rows
-    new_website_df = fetch_grist_table_as_pl(
-        os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"], "Intranet_details"
-    )
+    new_website_df = GristApi(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).fetch_table_pl("Intranet_details")
 
     # Selecting useful columns
     cols_to_keep = [

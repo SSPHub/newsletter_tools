@@ -1,6 +1,7 @@
 import re  # For pattern matching to search for emails
 import os
 import polars as pl
+from src.utils.grist_api import GristApi
 
 def extract_emails_from_txt(file_path="newsletter_tools/test/replies.txt"):
     """
@@ -44,10 +45,11 @@ def get_ids_of_email(emails_list):
         []
     """
     # Get the latest GRIST directory
-    directory_df = fetch_grist_table_as_pl(
-        os.environ["GRIST_SSPHUB_DIRECTORY_ID"], "Contact"
+    directory_df = (
+        GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"])
+        .fetch_table_pl("Contact")
+        .select(["id", "Email"])
     )
-    directory_df = directory_df.select(["id", "Email"])
 
     # Filter the emails
     res = directory_df.filter(pl.col("Email").is_in(emails_list))
@@ -70,7 +72,7 @@ def delete_email_from_contact_table(file_path):
     print(str(len(emails_list)) + " emails extraits du fichier: ", emails_list)
     emails_id = get_ids_of_email(emails_list)
     print(str(len(emails_id)) + " emails trouvés dans la table Contact \n")
-    get_dinum_grist_login(os.environ["GRIST_SSPHUB_DIRECTORY_ID"]).delete_records(
+    GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"]).delete_records(
         "Contact", emails_id
     )
     print("Emails supprimés de la table Contact \n")

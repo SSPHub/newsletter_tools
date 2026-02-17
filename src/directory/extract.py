@@ -1,5 +1,6 @@
 import os
 import polars as pl
+from src.utils.grist_api import GristApi
 
 def get_directory_as_df():
     """
@@ -11,24 +12,22 @@ def get_directory_as_df():
     Returns:
         A pl.DataFrame with three columns : ['Email', 'Nom', 'Nom_domaine', 'Supprimez_mon_compte']
     """
-    # fetch all the rows of general enlisted persons
-    directory_df = fetch_grist_table_as_pl(
-        os.environ["GRIST_SSPHUB_DIRECTORY_ID"], "Contact"
-    )
-
     # Selecting set of columns
     cols_to_keep = ["Email", "Nom", "Nom_domaine", "Supprimez_mon_compte"]
 
-    directory_df = directory_df.select(cols_to_keep)
+    # fetch all the rows of general enlisted persons
+    directory_df = (
+        GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"])
+        .fetch_table_pl("Contact")
+        .select(cols_to_keep)
+    )
 
     # Fetching data for management
     # Selecting set of columns
     cols_to_keep = ["Email", "Nom", "Nom_domaine"]
 
     directory_df_mngmt = (
-        fetch_grist_table_as_pl(
-            os.environ["GRIST_SSPHUB_DIRECTORY_ID"], "Encadrement_SSMs"
-        )
+        GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"]).fetch_table_pl("Encadrement_SSMs")
         .select(cols_to_keep)
         .with_columns(Supprimez_mon_compte=False)
     )
