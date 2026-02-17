@@ -102,3 +102,25 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
     return cleaned_yaml_str
 
 
+
+def knit_to_html(processed_qmd_file):
+    """
+    knit a qmd file to html
+
+    Args:
+        processed_qmd_file (string): file path to the qmd file to knit
+
+    Returns:
+        None
+    Saves the knitted file with same name as qmd file, same folder
+    """
+    # Use the Quarto CLI to knit the QMD file to HTML
+    import subprocess
+
+    try:
+        subprocess.run(
+            ["quarto", "render", processed_qmd_file, "--to", "html"], check=True
+        )
+        print("QMD file successfully knitted to HTML")
+    except subprocess.CalledProcessError as e:
+        print(f"Error knitting QMD file to HTML: {e}")
