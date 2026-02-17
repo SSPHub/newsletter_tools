@@ -80,14 +80,14 @@ def test_fill_template_one_row():
     )
 
     fill_template(
-        "newsletter_tools/fusion_site/template.qmd", df, "newsletter_tools/test"
+        "newsletter_tools/src/merge/fusion_site/template.qmd", df, "newsletter_tools/test"
     )
 
 
 def test_fill_template_two_rows():
     new_website_df = get_grist_merge_as_df()
     fill_template(
-        "newsletter_tools/fusion_site/template.qmd",
+        "newsletter_tools/src/merge/fusion_site/template.qmd",
         new_website_df.head(2),
         "newsletter_tools/test",
     )

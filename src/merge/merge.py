@@ -138,7 +138,7 @@ def get_grist_merge_as_df():
 
 
 def fill_all_templates_from_grist(
-    path_to_template="newsletter_tools/fusion_site/template.qmd",
+    path_to_template="newsletter_tools/src/merge/fusion_site/template.qmd",
     directory="newsletter_tools/test",
 ):
     """
