@@ -1,15 +1,3 @@
-# /// script
-# requires-python = ">=3.13"
-# dependencies = [
-#     "email-mime",
-#     "os",
-#     "pyyaml",
-#     "requests",
-#     "grist-api",
-#     "polars",
-# ]
-# ///
-
 from src.email.prep import download_images_for_newsletter
 from src.email.knit import process_qmd_file_for_email, knit_to_html
 from src.email.generate import generate_eml_file
