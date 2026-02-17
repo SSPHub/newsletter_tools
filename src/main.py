@@ -10,8 +10,6 @@
 # ]
 # ///
 
-from email.mime.multipart import MIMEMultipart  # To generate the draft email
-from email.mime.text import MIMEText  # To generate the draft email
 import requests  # To transform newsletter into email, call Github API and download files
 import yaml  # To update newsletter qmd metadata for the email
 import os  # to remove temporary files, create directory etc
