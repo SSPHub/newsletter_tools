@@ -2,6 +2,7 @@ import newsletter_tools.my_functions as myf
 import polars as pl
 import yaml
 import os
+from src.utils.grist_api import GristApi
 
 # Params
 repo_owner = "InseeFrLab"
@@ -71,6 +72,6 @@ df_grist = (
 )
 
 # Add records to grist table
-myf.get_dinum_grist_login(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).add_records(
+GristApi(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).add_records(
     "Retours", df_grist.to_dicts()
 )

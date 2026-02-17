@@ -1,10 +1,20 @@
-from src import *
+from src.generate_email import *
+from src.directory.replies import extract_emails_from_txt, get_ids_of_email
+from src.directory.extract import get_emails
+from src.directory.extract import get_directory_as_df
 import time  # for pausing code execution
 import polars as pl
+import os
+os.chdir("newsletter_tools")
+from src.utils.grist_api import GristApi
 
 def test_fetch_grist():
-    fetch_grist_table_as_pl(get_grist_merge_website_login(), "Intranet_details")
+    GristApi(os.environ["GRIST_SSPHUB_WEBSITE_MERGE_ID"]).fetch_table_pl("Intranet_details")
 
+# df = GristApi(os.environ['GRIST_SSPHUB_DIRECTORY_ID']).fetch_table_pl("Contact")
+# df.glimpse()
+
+# df.select(pl.col("Comment_as_tu_entendu_parler_de_la_newsletter_").value_counts())
 
 def test_generate_email():
     generate_email(
@@ -37,7 +47,7 @@ def write_test_data():
         "Contact me at test4@example.com for assistance.\n",  # Email in the middle of a sentence
     ]
 
-    with open("newsletter_tools/test/replies.txt", mode="w") as file:
+    with open("src/test/replies.txt", mode="w") as file:
         file.writelines(lines)
 
 
@@ -45,7 +55,7 @@ def test_extract_emails():
     write_test_data()
     # Test function
     assert "test9@example.com" in extract_emails_from_txt(
-        file_path="newsletter_tools/test/replies.txt"
+        file_path="src/test/replies.txt"
     )
 
 
