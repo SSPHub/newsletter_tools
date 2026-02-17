@@ -1,3 +1,4 @@
+import os
 
 def fetch_grist_table_as_pl(doc_grist_id, table_id):
     """

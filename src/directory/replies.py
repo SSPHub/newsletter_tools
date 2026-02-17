@@ -1,4 +1,5 @@
 import re  # For pattern matching to search for emails
+import os
 
 def extract_emails_from_txt(file_path="newsletter_tools/test/replies.txt"):
     """

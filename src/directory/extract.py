@@ -1,3 +1,5 @@
+import os
+
 def get_directory_as_df():
     """
     Fetch back directory of SSPHUB and management as a pl dataframe

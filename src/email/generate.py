@@ -1,6 +1,7 @@
 
 from email.mime.multipart import MIMEMultipart  # To generate the draft email
 from email.mime.text import MIMEText  # To generate the draft email
+import os
 
 def generate_eml_file(
     email_body,

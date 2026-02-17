@@ -1,6 +1,7 @@
 import shutil  # to remove directory and its content
 import zipfile  # GRIST attachments
 import requests
+import os
 
 def unzip_dir(zip_file_path, extraction_dir):
     """

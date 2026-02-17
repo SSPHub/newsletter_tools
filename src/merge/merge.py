@@ -1,3 +1,5 @@
+import os
+
 def clean_br_values_df(df):
     """
     Replace the /n by HTML <br> mark up or nothing for columns who will end up in a Md table/YAML part
