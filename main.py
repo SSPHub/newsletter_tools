@@ -1,6 +1,5 @@
 import os
 from src.generate_email import generate_email
-import argparse
 
 def main(newsletter_nb: int=22, branch:str = 'main', email_object: str="[SSPHub] Infolettre de janvier"):
     """
