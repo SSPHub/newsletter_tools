@@ -58,3 +58,14 @@ def generate_email(
 
     if drop_temp:
         remove_files_dir(temp_file_qmd, temp_file_html)
+
+if __name__ == '__main__':
+    generate_email(
+        number=21,
+        branch='main',
+        email_object='Pour test',
+        email_to=os.environ["EMAIL_VALIDATION_TO"],
+        email_bcc="",
+        email_from=None,
+        email_cc=os.environ["EMAIL_VALIDATION_CC"] + ";" + os.environ["EMAIL_SSPHUB"],
+    )
