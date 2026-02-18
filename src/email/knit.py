@@ -66,7 +66,7 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
             - datavis\n  - IA \n\ncategories:\n  - Infolettre\n\n',
             'https://ssphub.netlify.app/infolettre/'
             )
-        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../newsletter_tools/email/css/style.css\n"
+        "title: 'La rentrée 2025:'\ndescription: '*Infolettre de __Septembre 2025__ disponible sur le site du [réseau](https://ssphub.netlify.app/infolettre/)*'\nlang: fr\nformat:\n  html:\n    self-contained: true\n    css: ../email/css/style.css\n"
 
     """
 
@@ -93,7 +93,7 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
     cleaned_yaml["format"] = {
         "html": {
             "self-contained": True,  # To have images inside the email
-            "css": "../newsletter_tools/email/css/style.css",
+            "css": "../email/css/style.css",
         }
     }
 
