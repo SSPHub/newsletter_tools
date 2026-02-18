@@ -73,7 +73,7 @@ def delete_email_from_contact_table(file_path):
     emails_id = get_ids_of_email(emails_list)
     print(str(len(emails_id)) + " emails trouvés dans la table Contact \n")
     GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"]).delete_records(
-        "Contact", emails_id
+        "Contact", json=emails_id
     )
     print("Emails supprimés de la table Contact \n")
 

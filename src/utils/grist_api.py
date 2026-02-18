@@ -87,15 +87,15 @@ class GristApi:
             f"{self.table_url}/{table_id}/records", headers=self.headers, **kwarg
         )
         return response
-
     def delete_records(self, table_id, **kwarg):
+
         """
         Wrapper for a POST requests to delete records from a table.
         Records to delete should be identified by a list of their ids
 
         Args:
-            The grist table id
-            Additionnal arguments to pass on to requets.post()
+            table_id: The grist table id
+            **kwarg: Additionnal arguments to pass on to requets.post()
 
         Returns:
             response from requests.post
