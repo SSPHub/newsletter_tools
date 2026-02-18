@@ -29,15 +29,15 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - Faire `uv sync`
   - Set interpreter path : F1 in VS Code and then select interpreter and choose newsletter_tools/.venv/bin/python / ou source .venv/bin/activate ?
   - To generate email :
-    - from the CLI, use uv run main.py with arguments. For example `uv run main.py --number 21 --branch newsletter_21 --email_object "Mon objet"`
-    - You can also do it manually by going to script.py, and run function generate_email with Object. But it creates issues with working directory for css (file : email/css/style.css)
+    - from the CLI, use uv run clearance.py with arguments. For example `uv run clearance.py -n 21 -b newsltter_21`
+    - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object. But it creates issues with working directory for css (file : email/css/style.css)
   - download email
   - add text to say It's the newsletter for clearance
   - send it
 - Envoi de la newsletter
   - To generate draft email :
     - from the CLI, use uv run main.py with arguments. For example `uv run main.py --number 21 --branch main --email_object "Mon objet"`
-    - You can also do it manually by going to script.py, and run function generate_email with Object.
+    - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object.
       But it creates issues with working directory for css (file : email/css/style.css)
   - Download email
   - Check the newsletter (format, typos etc)
@@ -46,8 +46,10 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - Press Send
 - Après envoi :
   - Cleaning de la mailing list : copier tous les messages d'erreurs dans un fichier "replies.txt" placé dans le dossier parent newsletter_tools/
-  - Pour les supprimer : Function delete_email_from_contact_table va extraire les emails et les supprimer de la table Contact de Grist.
-    Fonctionne aussi avec des emails pas dans l'annuaire (ne fera rien du coup).
+  - Pour les supprimer :
+    - from the CLI, use uv run treat_replies.py with file path as argument. For example `uv run treat_replies.py -f replies.txt`. By default, file is the replies.txt file located in newsletter_tools.
+    - deprecated - Function delete_email_from_contact_table va extraire les emails et les supprimer de la table Contact de Grist.
+      Fonctionne aussi avec des emails pas dans l'annuaire (ne fera rien du coup).
 
 ### Fusion site SSPHub / SSPLab
 
