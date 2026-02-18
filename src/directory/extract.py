@@ -47,13 +47,13 @@ def get_emails():
         >>> get_emails()
         '<myemail@example.com>; <myemail2@example.com>'
     """
-    my_directory_df = get_directory_as_df()
     my_directory_df = (
-        my_directory_df.filter(~pl.col("Supprimez_mon_compte"))  # ~ is equivalent to not
+        get_directory_as_df()
+        .filter(~pl.col("Supprimez_mon_compte"))  # ~ is equivalent to not
         .unique(subset="Email")
         .sort(["Nom_domaine", "Nom"])
+        .with_columns(Email="<" + pl.col("Email") + ">")  # Turning emails from myemail@example.com to <myemail@example.com>
     )
-    # Turning emails from myemail@example.com to <myemail@example.com>
-    my_directory_df.with_columns("<" + pl.col("Email") + ">")
+
     # Joining all emails into one string '<myemail@example.com>; <myemail2@example.com>'
     return "; ".join(my_directory_df["Email"])
