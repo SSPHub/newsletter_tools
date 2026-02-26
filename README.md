@@ -26,10 +26,10 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - Ouvrir Onyxia
   - Avoir ce repo chargé
   - `cd newsletter_tools`
-  - Faire `uv sync`
-  - Set interpreter path : F1 in VS Code and then select interpreter and choose newsletter_tools/.venv/bin/python / ou source .venv/bin/activate ?
+  - (deprecated) Faire `uv sync`
+  - (deprecated) Set interpreter path : F1 in VS Code and then select interpreter and choose newsletter_tools/.venv/bin/python / ou source .venv/bin/activate ?
   - To generate email :
-    - from the CLI, use uv run clearance.py with arguments. For example `uv run clearance.py -n 21 -b newsltter_21`
+    - from the CLI, use uv run clearance.py with arguments. For example `uv run clearance.py -n 21 -b newsletter_21`
     - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object. But it creates issues with working directory for css (file : email/css/style.css)
   - download email
   - add text to say It's the newsletter for clearance
@@ -42,7 +42,7 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - Download email
   - Check the newsletter (format, typos etc)
   - Select the right Outlook account
-  - Deal with FMB and global lists
+  - Deal with FMB and global lists (?)
   - Press Send
 - Après envoi :
   - Cleaning de la mailing list : copier tous les messages d'erreurs dans un fichier "replies.txt" placé dans le dossier parent newsletter_tools/
