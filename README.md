@@ -56,11 +56,10 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 
 #### Après envoi :
 
-- Cleaning de la mailing list : copier tous les messages d'erreurs dans un fichier "replies.txt" placé dans le dossier parent newsletter_tools/
-- Pour les supprimer :
-  - from the CLI, use uv run treat_replies.py with file path as argument. For example `uv run treat_replies.py -f replies.txt`. By default, file is the replies.txt file located in newsletter_tools.
-  - deprecated - Function delete_email_from_contact_table va extraire les emails et les supprimer de la table Contact de Grist.
-    Fonctionne aussi avec des emails pas dans l'annuaire (ne fera rien du coup).
+- Cleaning de la mailing list : copier tous les messages d'erreurs dans le fichier "newsletter_tools/replies.txt"
+- Pour les supprimer : from the CLI, use uv run treat_replies.py with file path as argument. If file is "newsletter_tools/replies.txt", no need to specify file path. For example `uv run treat_replies.py -f otherfolder/replies.txt` or `uv run treat_replies.py` if default file is used
+- deprecated - Function delete_email_from_contact_table va extraire les emails et les supprimer de la table Contact de Grist.
+  Fonctionne aussi avec des emails pas dans l'annuaire (ne fera rien du coup).
 
 ### Fusion site SSPHub / SSPLab
 
