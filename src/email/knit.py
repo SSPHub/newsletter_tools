@@ -79,7 +79,7 @@ def add_link_to_description(newsletter_url, yaml_data={"description": "Infolettr
     description = (
         "*"
         + yaml_data.get("description", "").strip()
-        + " disponible yohiho sur le site du [réseau]("
+        + " disponible sur le site du [réseau]("
         + newsletter_url
         + ")*"
     )
