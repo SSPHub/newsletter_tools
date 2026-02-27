@@ -27,6 +27,9 @@ def extract_emails_from_txt(file_path="newsletter_tools/test/replies.txt"):
     emails = set(emails)
     emails = list(emails)
 
+    # Turn to lowercase
+    emails = [s.lower() for s in emails]
+
     return emails
 
 
@@ -49,6 +52,9 @@ def get_ids_of_email(emails_list):
         GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"])
         .fetch_table_pl("Contact")
         .select(["id", "Email"])
+        .with_columns(
+            pl.col("Email").str.to_lowercase()  # to lowercase for email matching
+        )
     )
 
     # Filter the emails
