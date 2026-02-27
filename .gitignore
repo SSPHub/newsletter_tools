@@ -21,6 +21,7 @@ __pycache__/
 # Emails
 *.msg
 *.eml
+.temp/
 
 # C extensions
 *.so
