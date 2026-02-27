@@ -23,7 +23,7 @@ if __name__ == "__main__":
     parser.add_argument("-bcc", "--email_bcc", default=get_emails())
     parser.add_argument("-from", "--email_from", default="")
     parser.add_argument("-cc", "--email_cc", default="")
-    parser.add_argument("-t", "--drop_temp", default="True")
+    parser.add_argument("-t", "--drop_temp", default="False")
 
     args = parser.parse_args()
 
