@@ -46,6 +46,28 @@ def process_qmd_file_for_email(
         f.write(processed_qmd_content)
 
 
+def add_link_to_description(newsletter_url, yaml_data={"description": "Infolettre"}):
+    """
+    Add to the description keys of a dict the link to the url of the newsletter
+
+    Arg :
+        newsletter_url: url of the newsletter to insert a link to that newsletter
+        yaml_data: a dict with a description key
+
+    Returns:
+        (string) updated description field with link to newsletter
+    """
+    description = (
+        "*"
+        + yaml_data.get("description", "").strip()
+        + " disponible sur le site du [réseau]("
+        + newsletter_url
+        + ")*"
+    )
+
+    return description
+
+
 def clean_yaml_header_for_email(yaml_header, newsletter_url):
     """
     Function to transform Yaml header of an index.qmd file and transform it for a qmd file that will be
@@ -74,13 +96,10 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
     yaml_data = yaml.safe_load(yaml_header)
 
     # Keep only the specified keys
-    # We put the link
-    description = (
-        "*"
-        + yaml_data.get("description", "").strip()
-        + " disponible sur le site du [réseau]("
-        + newsletter_url
-        + ")*"
+    # Transform the description file
+    description = add_link_to_description(
+        newsletter_url,
+        yaml_data=yaml_data
     )
 
     cleaned_yaml = {
