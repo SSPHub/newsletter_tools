@@ -41,7 +41,7 @@ Bonne lecture !
     """
 
     # Store output
-    dest_file = './.temp/chap_message.txt'
+    dest_file = './.temp/tchap_message.txt'
 
     with open(dest_file, 'w') as file:
         file.write(f"{message}\n---\n{description}\n{cleaned_newsletter}")
