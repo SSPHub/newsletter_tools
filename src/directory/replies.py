@@ -41,7 +41,7 @@ def get_ids_of_email(emails_list):
         emails_list (list) : a list of strings, containing the emails to look for in df
 
     Returns:
-        list: A list of ids of the rows in df
+        a polars dataframe with id and Email columns
 
     Example:
         >>> get_ids_of_email(['test1@insee.fr', 'test2@insee.fr'])
@@ -59,7 +59,6 @@ def get_ids_of_email(emails_list):
 
     # Filter the emails
     res = directory_df.filter(pl.col("Email").is_in(emails_list))
-    res = pl.Series(res.select(pl.col("id"))).to_list()
 
     return res
 
@@ -75,11 +74,23 @@ def delete_email_from_contact_table(file_path):
         None
     """
     emails_list = extract_emails_from_txt(file_path)
-    print(str(len(emails_list)) + " emails extraits du fichier: ", emails_list)
-    emails_id = get_ids_of_email(emails_list)
-    print(str(len(emails_id)) + " emails trouvés dans la table Contact \n")
+    directory_df = get_ids_of_email(emails_list)
+    emails_id = directory_df["id"].to_list()
     GristApi(os.environ["GRIST_SSPHUB_DIRECTORY_ID"]).delete_records(
         "Contact", json=emails_id
     )
-    print("Emails supprimés de la table Contact \n")
+
+    # Managing output
+    print_df = pl.DataFrame({"Email":emails_list})
+    print_df = (
+        directory_df
+        .join(print_df, how="right", on="Email")
+        .fill_null(value="non")
+        .select("Email", "id")
+        .rename({"Email":"Email détecté réponses", "id":"détecté_annuaire"})
+    )
+    pl.Config.set_tbl_rows(print_df.height)
+    print(f"{print_df}")
+    print(f"{print_df.height} emails détectés dans les réponses")
+    print(f"{print_df["détecté_annuaire"].drop_nulls().len()} emails supprimés de la table Contact\n")
 
