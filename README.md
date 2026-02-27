@@ -35,15 +35,19 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - add text to say It's the newsletter for clearance
   - send it
 - Envoi de la newsletter
-  - To generate draft email :
-    - from the CLI, use uv run main.py with arguments. For example `uv run main.py --number 21 --branch main --email_object "Mon objet"`
-    - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object.
-      But it creates issues with working directory for css (file : email/css/style.css)
-  - Download email
-  - Check the newsletter (format, typos etc)
-  - Select the right Outlook account
-  - Deal with FMB and global lists (?)
-  - Press Send
+  - Email :
+    - To generate draft email :
+      - from the CLI, use uv run main.py with arguments. For example `uv run main.py -n 21 -o "[SSPHub] - Infolettre 21 de décembre 2025"`
+      - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object.
+        But it creates issues with working directory for css (file : email/css/style.css)
+    - Download email
+    - Check the newsletter (format, typos etc)
+    - Select the right Outlook account
+    - Deal with FMB and global lists (?)
+    - Press Send
+  - Tchap :
+    - to generate tchap message : from the CLI, use uv run tchap.py with infolettre nb as argument. For example `uv run main.py -n 23 `
+    - copy paste txt stored in .temp/tchap_message.txt in the SSPHub Tchap group
 - Après envoi :
   - Cleaning de la mailing list : copier tous les messages d'erreurs dans un fichier "replies.txt" placé dans le dossier parent newsletter_tools/
   - Pour les supprimer :
