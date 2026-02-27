@@ -23,12 +23,12 @@ if __name__ == "__main__":
     parser.add_argument("-bcc", "--email_bcc", default=get_emails())
     parser.add_argument("-from", "--email_from", default="")
     parser.add_argument("-cc", "--email_cc", default="")
-    parser.add_argument("-t", "--drop_temp", default=True)
+    parser.add_argument("-t", "--drop_temp", default="True")
 
     args = parser.parse_args()
 
     try:
-        main(args.number, args.branch, args.email_object, args.email_to, args.email_bcc, args.email_from, args.email_cc, args.drop_temp)
+        main(args.number, args.branch, args.email_object, args.email_to, args.email_bcc, args.email_from, args.email_cc, args.drop_temp == "True")
     except Exception as e:
         print(f"Fatal error in pipeline: {e}")
         raise
