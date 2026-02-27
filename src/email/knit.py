@@ -1,6 +1,32 @@
 import yaml
 import subprocess
 
+
+def parse_qmd_file(qmd_content):
+    """
+    Splits the YAML header and the md content from a qmd file
+
+    Args:
+        qmd_content (string): the original qmd file to process, typically the result of fetch_qmd_file
+
+    Returns:
+        a tuple of
+        (
+            yaml_header,
+            html_content
+        )
+    """
+    parts = qmd_content.split("---", 2)
+    if len(parts) < 3:
+        print("Invalid .qmd file format")
+        return None
+
+    yaml_header = parts[1]
+    html_content = parts[2]
+
+    return yaml_header, html_content
+
+
 def process_qmd_file_for_email(
     qmd_content,
     qmd_output_file,
@@ -26,14 +52,7 @@ def process_qmd_file_for_email(
     """
 
     # qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd')
-    # Split the YAML header and the HTML content
-    parts = qmd_content.split("---", 2)
-    if len(parts) < 3:
-        print("Invalid .qmd file format")
-        return None
-
-    yaml_header = parts[1]
-    html_content = parts[2]
+    yaml_header, html_content = parse_qmd_file(qmd_content)
 
     # Clean the YAML header
     cleaned_yaml_header = clean_yaml_header_for_email(yaml_header, newsletter_url)
@@ -60,7 +79,7 @@ def add_link_to_description(newsletter_url, yaml_data={"description": "Infolettr
     description = (
         "*"
         + yaml_data.get("description", "").strip()
-        + " disponible sur le site du [réseau]("
+        + " disponible yohiho sur le site du [réseau]("
         + newsletter_url
         + ")*"
     )
