@@ -11,6 +11,10 @@ res.qmd
 test/*.txt
 test/*.qmd
 
+# Documentation
+*.gv
+*.png
+!docs/*.png
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
@@ -232,7 +236,6 @@ __marimo__/
 # Images
 *.jpg
 *.jpeg
-*.png
 *.gif
 *.bmp
 *.svg
