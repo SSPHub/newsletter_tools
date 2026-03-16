@@ -60,6 +60,39 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 - Pour les supprimer : from the CLI, use uv run treat_replies.py with file path as argument. If file is "newsletter_tools/replies.txt", no need to specify file path. For example `uv run treat_replies.py -f otherfolder/replies.txt` or `uv run treat_replies.py` if default file is used
 - the script returns a dataframe with extracted emails, and the one matched in the directory. If emails are not found, it wont delete any email.
 
-### Fusion site SSPHub / SSPLab
+### Fusion site SSPHub / SSPLab (deprecated)
 
 - (deprecated) To import draft template to SSPHub's site, go to script.py and run fill_all_templates_from_grist
+
+# Documentation
+
+![overview of the structure of the functions (except testing functions)](docs/call_graph_all_but_test.png)
+
+The graph can be generated with `graphs.sh`
+
+## Clearance
+
+Function to generate a draft email based on newsletter number and branch name of the repo for clearance.
+Not necessary to have published the newsletter.
+
+![Generate email for clearance](docs/call_graph_clearance.png)
+
+## Main
+
+Function to generate a draft email based on newsletter number and branch name of the repo.
+Very similar to generate email for clearance, except that it retrieves the directory and that newsletter must be published..
+
+![Generate email - official send](docs/call_graph_main.png)
+
+## Tchap
+
+Function to generate a draft Tchap version of the newsletter based on its number.
+Newsletter must be published.
+
+![Generate Tchap message for the newsletter](docs/call_graph_tchap.png)
+
+## Treat replies
+
+Function to delete a detect emails and delete them from directory after newsletter has been sent.
+
+![Delete accounts from directory](docs/call_graph_treat_replies.png)
