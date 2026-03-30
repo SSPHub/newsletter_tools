@@ -38,11 +38,12 @@ def extract_branch_max_nb(branches_list: list):
     pattern = "infolettre_"
     nb_list = [
         int(branch[len(pattern) :])
-        for branch in branch_list
+        for branch in branches_list
         if branch.startswith(pattern)
     ]
+    number = max(nb_list)
 
-    return max(nb_list)
+    return f"{pattern}{number}", number
 
 
 def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
