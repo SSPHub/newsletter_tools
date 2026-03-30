@@ -3,7 +3,7 @@ import os
 import requests
 
 
-def list_github_branches(repo_owner, repo_name, github_token=None):
+def list_github_branches(repo_owner: str, repo_name: str):
     """
     Lists all branches of a GitHub repository.
 
@@ -23,6 +23,26 @@ def list_github_branches(repo_owner, repo_name, github_token=None):
         return [branch["name"] for branch in branches]
     else:
         raise Exception(f"Error {response.status_code}: {response.text}")
+
+
+def extract_branch_max_nb(branches_list: list):
+    """
+    Returns the highest number from branch names starting with "infolettre_".
+
+    Args:
+        branches_list: List of branch names (e.g., ["infolettre_1", "infolettre_2"]).
+
+    Returns:
+        int: Highest number extracted from matching branch names.
+    """
+    pattern = "infolettre_"
+    nb_list = [
+        int(branch[len(pattern) :])
+        for branch in branch_list
+        if branch.startswith(pattern)
+    ]
+
+    return max(nb_list)
 
 
 def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
