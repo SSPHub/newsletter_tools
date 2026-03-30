@@ -1,5 +1,29 @@
-import requests
 import os
+
+import requests
+
+
+def list_github_branches(repo_owner, repo_name, github_token=None):
+    """
+    Lists all branches of a GitHub repository.
+
+    Args:
+        repo_owner (str): Owner of the repository.
+        repo_name (str): Name of the repository.
+
+    Returns:
+        list: List of branch names.
+    """
+    url = f"https://api.github.com/repos/{repo_owner}/{repo_name}/branches"
+
+    response = requests.get(url)
+
+    if response.status_code == 200:
+        branches = response.json()
+        return [branch["name"] for branch in branches]
+    else:
+        raise Exception(f"Error {response.status_code}: {response.text}")
+
 
 def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
     """
@@ -36,9 +60,6 @@ def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching contents from GitHub API: {e}")
         return None
-
-
-
 
 
 def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch="main"):
@@ -82,6 +103,7 @@ def list_raw_image_files(repo_owner, repo_name, subfolder_path, branch="main"):
 
     return image_files
 
+
 def fetch_qmd_file(url):
     """
     get the qmf file from an url and return it as string
@@ -104,6 +126,7 @@ def fetch_qmd_file(url):
     except requests.exceptions.RequestException as e:
         print(f"Error fetching the .qmd file: {e}")
         return None
+
 
 def raw_url_newsletter(number, branch="main"):
     """
