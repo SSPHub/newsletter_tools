@@ -55,7 +55,7 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - Deal with FMB and global lists (?)
   - Press Send
 - Tchap :
-  - to generate tchap message : from the CLI, use uv run tchap.py with infolettre nb as argument. For example `uv run main.py -n 23 `
+  - to generate tchap message : from the CLI, use `uv run tchap.py`. Infolettre nb is an optionnal argument (it will fetch it directly from the main branch). If you want to specify it, do it with `uv run main.py -n 23 `
   - copy paste txt stored in .temp/tchap_message.txt in the SSPHub Tchap group
 
 #### Après envoi :
