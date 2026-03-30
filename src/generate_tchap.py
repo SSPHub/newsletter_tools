@@ -47,7 +47,7 @@ def generate_tchap_message(number):
     # Intro message
     message = """Bonjour à tous,
 
-Vous avez dû recevoir l'infolettre dans vos boites mail. Si jamais vous voulez vous inscrire sur la liste de diffusion, c'est par [ici](https://grist.numerique.gouv.fr/o/ssphub/forms/jSjAV3L2F8mmiRVuVEpfF7/103).
+Vous avez dû recevoir l'infolettre de ce mois-ci dans vos boites mail. Si jamais vous voulez vous (dés)inscrire sur la liste de diffusion, c'est par [ici](https://grist.numerique.gouv.fr/o/ssphub/forms/jSjAV3L2F8mmiRVuVEpfF7/103).
 
 Et sinon, la voici en version Tchap (sans les images).
 Bonne lecture !
