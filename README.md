@@ -32,7 +32,9 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 - Avoir ce repo chargé
 - `cd newsletter_tools`
 - To generate email :
-  - from the CLI, use uv run clearance.py with arguments. For example `uv run clearance.py -n 21 -b newsletter_21`
+  - from the CLI, use `uv run clearance.py`.
+    - By default, clearance.py will catch the branch named "infolettre_NN" (NN a number) and retrieve NN as the number of the infolettre.
+    - If you specify branch and number, do it with `uv run clearance.py -n 21 -b infolettre_21`
   - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object. But it creates issues with working directory for css (file : email/css/style.css)
 - download email
 - add text to say It's the newsletter for clearance
@@ -42,7 +44,9 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 
 - Email :
   - To generate draft email :
-    - from the CLI, use uv run main.py with arguments. For example `uv run main.py -n 21 -o "[SSPHub] - Infolettre 21 de décembre 2025"`
+    - from the CLI, use uv run main.py.
+      - By default, main.py will look for folders named infolettre/infolettre_NN in the main branch and retrieve the max number.
+      - For example `uv run main.py -o "[SSPHub] - Infolettre de décembre 2025"` to specify the object of the email.
     - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object.
       But it creates issues with working directory for css (file : email/css/style.css)
   - Download email

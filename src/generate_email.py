@@ -5,6 +5,7 @@ from src.github.extract import (
     extract_branch_max_nb,
     fetch_qmd_file,
     list_github_branches,
+    list_raw_files,
     published_url_newsletter,
     raw_url_newsletter,
 )
@@ -48,9 +49,22 @@ def generate_email(
     repo_owner = "InseeFrLab"
     repo_name = "ssphub"
 
+    # Clearance part - newsletter not published
     if branch is None:
         branches_list = list_github_branches(repo_owner, repo_name)
         branch, number = extract_branch_max_nb(branches_list)
+
+    # Sending part - newsletter published on the main branch
+    if (branch == "main") & (number is None):
+        folders_files = list_raw_files(repo_owner, repo_name, "infolettre")
+        folders_list = [
+            folder["name"]
+            for folder in folders_files
+            if (folder["type"] == "dir")
+            & (folder["name"][-2:] != "XX")
+            & (folder["name"][-2:] != "ld")
+        ]
+        number = extract_branch_max_nb(folders_list)[1]
 
     download_images_for_newsletter(number, branch, ".temp", repo_owner, repo_name)
 
