@@ -178,27 +178,3 @@ def published_url_newsletter(number):
         'https://ssphub.netlify.app/infolettre/infolettre_19/'
     """
     return f"https://ssphub.netlify.app/infolettre/infolettre_{number}/"
-
-
-def list_image_files_for_newsletter(number, branch="main"):
-    """
-    Wrapper of list_raw_image_files. List image files present in the github folder InseeFrLab, repo ssphub. Ima
-
-    Arg :
-        number of the newsletter
-        branch where the newsletter is (main by default)
-
-    Returns:
-        list of path to the raw images files
-
-    Example:
-        >>> list_image_files_for_newsletter('19', branch='main')
-        ['https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png',
-        'https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/measles-cases-historical-us-states-heatmap.png']
-
-    """
-    repo_owner = "InseeFrLab"
-    repo_name = "ssphub"
-    subfolder_path = f"infolettre/infolettre_{number}"
-
-    return list_raw_image_files(repo_owner, repo_name, subfolder_path, branch)

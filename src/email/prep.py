@@ -1,5 +1,4 @@
 from src.utils.files import download_file
-from src.github.extract import list_image_files_for_newsletter
 
 
 def download_images_for_newsletter(number, branch="main", output_dir=".temp"):
@@ -20,7 +19,9 @@ def download_images_for_newsletter(number, branch="main", output_dir=".temp"):
         Image file downloaded to .temp/2025_09_back_school.png
     """
     # Get the list of image files in the subfolder
-    image_files = list_image_files_for_newsletter(number, branch)
+    image_files = list_raw_image_files(
+        "InseeFrLab", "ssphub", f"infolettre/infolettre_{number}", branch
+    )
 
     if not image_files:
         print("No image files found in the subfolder.")
