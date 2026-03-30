@@ -1,6 +1,12 @@
-from src.tchap.message import replace_lines_images, detect_start_image
-from src.email.knit import parse_qmd_file, add_link_to_description
-from src.github.extract import fetch_qmd_file, raw_url_newsletter, published_url_newsletter
+from src.email.knit import add_link_to_description, parse_qmd_file
+from src.github.extract import (
+    extract_published_max_nb,
+    fetch_qmd_file,
+    published_url_newsletter,
+    raw_url_newsletter,
+)
+from src.tchap.message import detect_start_image, replace_lines_images
+
 
 def generate_tchap_message(number):
     """
@@ -19,13 +25,20 @@ def generate_tchap_message(number):
 
     """
 
+    if number is None:
+        repo_owner = "InseeFrLab"
+        repo_name = "ssphub"
+        number = extract_published_max_nb(repo_owner, repo_name)
+
     # Fetching published newsletter
     qmd_content = fetch_qmd_file(raw_url_newsletter(number, branch="main"))
     # Extracting content of the newsletter
     qmd_content_lines = parse_qmd_file(qmd_content)[1].split("\n")
 
     # Removing images
-    qmd_content_cleaned_lines = replace_lines_images(qmd_content_lines, detect_start_image(qmd_content_lines))
+    qmd_content_cleaned_lines = replace_lines_images(
+        qmd_content_lines, detect_start_image(qmd_content_lines)
+    )
     cleaned_newsletter = "\n".join(qmd_content_cleaned_lines)
 
     # Generate description to be added at top of the Tchap message
@@ -41,10 +54,9 @@ Bonne lecture !
     """
 
     # Store output
-    dest_file = './.temp/tchap_message.txt'
+    dest_file = "./.temp/tchap_message.txt"
 
-    with open(dest_file, 'w') as file:
+    with open(dest_file, "w") as file:
         file.write(f"{message}\n---\n{description}\n{cleaned_newsletter}")
 
     print(f"Tchap message generated at {dest_file}")
-

@@ -5,6 +5,7 @@ res.qmd
 
 # Email data
 *.txt
+replies.txt
 
 # Test
 2023_Enquete_Budget_Famille/

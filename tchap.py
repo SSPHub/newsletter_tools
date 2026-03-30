@@ -1,6 +1,7 @@
-import os
-from src.generate_tchap import generate_tchap_message
 import argparse
+
+from src.generate_tchap import generate_tchap_message
+
 
 def main(*args, **kwargs):
     """
@@ -14,8 +15,11 @@ def main(*args, **kwargs):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog='Generate tchap message', description='Generate an email from the newsletter stored as a qmd file on the ssphub repo')
-    parser.add_argument("-n", "--number", default=22)
+    parser = argparse.ArgumentParser(
+        prog="Generate tchap message",
+        description="Generate an email from the newsletter stored as a qmd file on the ssphub repo",
+    )
+    parser.add_argument("-n", "--number", default=None)
 
     args = parser.parse_args()
 
@@ -24,5 +28,3 @@ if __name__ == "__main__":
     except Exception as e:
         print(f"Fatal error in pipeline: {e}")
         raise
-
-
