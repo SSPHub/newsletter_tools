@@ -1,7 +1,9 @@
-import re  # For pattern matching to search for emails
 import os
+import re  # For pattern matching to search for emails
+
 import polars as pl
 from src.utils.grist_api import GristApi
+
 
 def extract_emails_from_txt(file_path="newsletter_tools/test/replies.txt"):
     """
@@ -71,7 +73,18 @@ def delete_email_from_contact_table(file_path):
         file_path (string): path to the txt file to extract emails from
 
     Return:
-        None
+        shape: (3, 2)
+        ┌─────────────────────────────────┬──────────────────┐
+        │ Email détecté réponses          ┆ détecté_annuaire │
+        │ ---                             ┆ ---              │
+        │ str                             ┆ i64              │
+        ╞═════════════════════════════════╪══════════════════╡
+        │ my_email1@gouv.fr               ┆ null             │
+        │ my_email2@gouv.fr               ┆ 5                │
+        │ my_email3@gouv.fr               ┆ 6                │
+        └─────────────────────────────────┴──────────────────┘
+        3 emails détectés dans les réponses
+        2 emails supprimés de la table Contact
     """
     emails_list = extract_emails_from_txt(file_path)
     directory_df = get_ids_of_email(emails_list)
@@ -81,16 +94,16 @@ def delete_email_from_contact_table(file_path):
     )
 
     # Managing output
-    print_df = pl.DataFrame({"Email":emails_list})
+    print_df = pl.DataFrame({"Email": emails_list})
     print_df = (
-        directory_df
-        .join(print_df, how="right", on="Email")
+        directory_df.join(print_df, how="right", on="Email")
         .fill_null(value="non")
         .select("Email", "id")
-        .rename({"Email":"Email détecté réponses", "id":"détecté_annuaire"})
+        .rename({"Email": "Email détecté réponses", "id": "détecté_annuaire"})
     )
     pl.Config.set_tbl_rows(print_df.height)
     print(f"{print_df}")
     print(f"{print_df.height} emails détectés dans les réponses")
-    print(f"{print_df["détecté_annuaire"].drop_nulls().len()} emails supprimés de la table Contact\n")
-
+    print(
+        f"{print_df['détecté_annuaire'].drop_nulls().len()} emails supprimés de la table Contact\n"
+    )
