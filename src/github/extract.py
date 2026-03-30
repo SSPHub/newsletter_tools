@@ -46,6 +46,30 @@ def extract_branch_max_nb(branches_list: list):
     return f"{pattern}{number}", number
 
 
+def extract_published_max_nb(repo_owner: str, repo_name: str):
+    """
+    Returns the highest number in folder infolettre/infolettre_NN from main branch.
+
+    Args:
+        repo_owner (str): Owner of the repository.
+        repo_name (str): Name of the repository.
+
+    Returns:
+        int: Highest number extracted from matching branch names.
+    """
+    folders_files = list_raw_files(repo_owner, repo_name, "infolettre")
+    folders_list = [
+        folder["name"]
+        for folder in folders_files
+        if (folder["type"] == "dir")
+        & (folder["name"][-2:] != "XX")
+        & (folder["name"][-2:] != "ld")
+    ]
+    number = extract_branch_max_nb(folders_list)[1]
+
+    return number
+
+
 def list_raw_files(repo_owner, repo_name, subfolder_path, branch="main"):
     """
     List files and folder present in a given github folder.
