@@ -6,6 +6,7 @@ from src.github.extract import (
     fetch_qmd_file,
     list_github_branches,
     published_url_newsletter,
+    extract_published_max_nb,
     raw_url_newsletter,
 )
 from src.utils.files import remove_files_dir

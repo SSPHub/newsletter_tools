@@ -46,13 +46,13 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
   - To generate draft email :
     - from the CLI, use uv run main.py.
       - By default, main.py will look for folders named infolettre/infolettre_NN in the main branch and retrieve the max number.
-      - For example `uv run main.py -o "[SSPHub] - Infolettre de décembre 2025"` to specify the object of the email.
+      - For example `uv run main.py -o "[SSPHub] - Infolettre de décembre 2026"` to specify the object of the email.
     - deprecated - You can also do it manually by going to script.py, and run function generate_email with Object.
       But it creates issues with working directory for css (file : email/css/style.css)
   - Download email
   - Check the newsletter (format, typos etc)
   - Select the right Outlook account
-  - Deal with FMB and global lists (?)
+  - Deal with FMB and global lists -- no need
   - Press Send
 - Tchap :
   - to generate tchap message : from the CLI, use `uv run tchap.py`. Infolettre nb is an optionnal argument (it will fetch it directly from the main branch). If you want to specify it, do it with `uv run main.py -n 23 `

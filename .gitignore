@@ -8,9 +8,7 @@ res.qmd
 replies.txt
 
 # Test
-2023_Enquete_Budget_Famille/
-test/*.txt
-test/*.qmd
+test/
 
 # Documentation
 *.gv
