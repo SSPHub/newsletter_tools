@@ -46,6 +46,7 @@ L'objectif ici est de valider et d'envoyer la newsletter du SSPHub aux membres i
 #### Envoi de la newsletter
 
 - Email :
+  - CAUTION - Infolettre must have been merged into main before going further. 
   - To generate draft email :
     - from the CLI, use uv run main.py.
       - By default, main.py will look for folders named infolettre/infolettre_NN in the main branch and retrieve the max number.
