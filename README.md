@@ -17,6 +17,7 @@ Des assistants IA ont été utilisés pour la documentation ou le code de ce rep
 
 - Pour générer l'email de newsletter, les images doivent être stockées dans le repo git. Les images incluent directement avec des liens ne seront pas inclues dans l'email
 - la newsletter doit être stockée dans un fichier "index.qmd" stocké dans infolettre/infolettre_XX où XX est le numéro de l'infolettre. Si pas là, le lien de la newsletter publiée dans l'email ne sera pas le bon.
+- Les liens internes vers d'autres pages du site peuvent être écrits relativement, comme dans le site (par exemple `[texte](../../blog/2026_rencontresR/index.qmd)`). Lors de la génération de l'email, ils sont automatiquement réécrits en URLs absolues du site publié (`https://ssphub.netlify.app/...`) : `../../` pointe vers la racine du site (sections `blog/`, `event/`...) et `../` vers le dossier `infolettre/`. 
 - Si pas de branche spécifiée, le script ira prendre celle dont le nom est au format 'infolettre_XX', avec le nom du folder où aller chercher le "index.qmd" identique.
 
 ## Step by step
