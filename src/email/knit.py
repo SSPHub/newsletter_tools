@@ -1,5 +1,25 @@
 import yaml
 import subprocess
+import re
+from urllib.parse import urlparse
+
+
+def get_url_root(any_website_sub_url):
+    """
+    Function to return the base url of the website. 
+
+    Args: 
+        any_website_sub_url (str) : any url of the website 
+
+    Example:
+        >>> get_url_root("https://ssphub.netlify.app/coucou/infolettre")
+        'https://ssphub.netlify.app/' 
+
+    """
+    p = urlparse(any_website_sub_url)
+    site_root = f"{p.scheme}://{p.netloc}/"   
+
+    return site_root
 
 
 def parse_qmd_file(qmd_content):
@@ -27,6 +47,29 @@ def parse_qmd_file(qmd_content):
     return yaml_header, html_content
 
 
+def rewrite_internal_links(html_content, newsletter_url):
+    """
+    Turn relative internal links in the newsletter body into absolute URLs
+    on the published site, resolved against base_url (the published URL of
+    *this* newsletter
+    Bare filenames (e.g. an image like 'banner.png') are left untouched so
+    locally downloaded / embedded images keep working.
+    """
+    # Extracting root url
+    root_url = get_url_root(newsletter_url)
+
+    # First - replace ../../ by root_url
+    html_content = re.sub(r"\]\(\.\./\.\./", "](" + root_url, html_content) 
+
+    # Second - replace ../ by newsletter_url
+    html_content = re.sub(r"\]\(\.\./", "](" + newsletter_url, html_content) 
+
+    # Third - replace /index.qmd) by /) so that url points to the right html page
+    html_content = re.sub(r"/index\.qmd\)", "/)", html_content)
+
+    return html_content
+
+
 def process_qmd_file_for_email(
     qmd_content,
     qmd_output_file,
@@ -47,15 +90,18 @@ def process_qmd_file_for_email(
 
     Example:
         >>> process_qmd_file_for_email(
-    fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd'),
+    fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_26/index.qmd'),
     'cleaned_index.qmd')
     """
 
-    # qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/index.qmd')
+    qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/infolettre_26/infolettre/infolettre_26/index.qmd')
     yaml_header, html_content = parse_qmd_file(qmd_content)
 
     # Clean the YAML header
     cleaned_yaml_header = clean_yaml_header_for_email(yaml_header, newsletter_url)
+
+    # Clean internal links in the qmd part
+    html_content = rewrite_internal_links(html_content, newsletter_url)
 
     # Combine the cleaned YAML header and HTML content
     processed_qmd_content = f"---\n{cleaned_yaml_header}---\n{html_content}"
@@ -140,7 +186,6 @@ def clean_yaml_header_for_email(yaml_header, newsletter_url):
         cleaned_yaml, sort_keys=False, allow_unicode=True, width=4096
     )
     return cleaned_yaml_str
-
 
 
 def knit_to_html(processed_qmd_file):
