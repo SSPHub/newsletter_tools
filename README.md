@@ -2,6 +2,8 @@
 
 Tools to manage [SSPHub's](https://ssphub.netlify.app/) directory and [SSPHub's](https://ssphub.netlify.app/) newsletter system.
 
+Des assistants IA ont été utilisés pour la documentation ou le code de ce repo. 
+
 # Use
 
 ## Requirements
