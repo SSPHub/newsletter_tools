@@ -15,7 +15,7 @@ Tools to manage [SSPHub's](https://ssphub.netlify.app/) directory and [SSPHub's]
 
 - Pour générer l'email de newsletter, les images doivent être stockées dans le repo git. Les images incluent directement avec des liens ne seront pas inclues dans l'email
 - la newsletter doit être stockée dans un fichier "index.qmd" stocké dans infolettre/infolettre_XX où XX est le numéro de l'infolettre. Si pas là, le lien de la newsletter publiée dans l'email ne sera pas le bon.
-- nom de la branche par défaut dans l'argument du script est 'newsletter_XX', avec le nom du folder où aller chercher le "index.qmd" identique.
+- Si pas de branche spécifiée, le script ira prendre celle dont le nom est au format 'infolettre_XX', avec le nom du folder où aller chercher le "index.qmd" identique.
 
 ## Step by step
 
