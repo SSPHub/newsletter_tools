@@ -39,8 +39,7 @@ def generate_email(
         None
 
     Example:
-        >>> download_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_19/2025_09_back_school.png')
-        Image file downloaded to .temp/2025_09_back_school.png
+        >>> generate_email("Test", "test@test.fr", "")
     """
     temp_file = "./.temp/temp"
     temp_file_qmd = temp_file + ".qmd"
