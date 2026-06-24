@@ -57,12 +57,13 @@ def rewrite_internal_links(html_content, newsletter_url):
     """
     # Extracting root url
     root_url = get_url_root(newsletter_url)
+    infolettre_url = root_url + "infolettre/"
 
     # First - replace ../../ by root_url
     html_content = re.sub(r"\]\(\.\./\.\./", "](" + root_url, html_content) 
 
     # Second - replace ../ by newsletter_url
-    html_content = re.sub(r"\]\(\.\./", "](" + newsletter_url, html_content) 
+    html_content = re.sub(r"\]\(\.\./", "](" + infolettre_url, html_content) 
 
     # Third - replace /index.qmd) by /) so that url points to the right html page
     html_content = re.sub(r"/index\.qmd\)", "/)", html_content)
