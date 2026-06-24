@@ -93,8 +93,8 @@ def process_qmd_file_for_email(
     fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/main/infolettre/infolettre_26/index.qmd'),
     'cleaned_index.qmd')
     """
-
-    qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/infolettre_26/infolettre/infolettre_26/index.qmd')
+    # Debug
+    # qmd_content = fetch_qmd_file('https://raw.githubusercontent.com/InseeFrLab/ssphub/refs/heads/infolettre_26/infolettre/infolettre_26/index.qmd')
     yaml_header, html_content = parse_qmd_file(qmd_content)
 
     # Clean the YAML header
