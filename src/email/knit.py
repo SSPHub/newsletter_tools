@@ -4,21 +4,24 @@ import re
 from urllib.parse import urlparse
 
 
-def get_url_root(any_website_sub_url):
+def get_url_root(any_website_sub_url: str = ""):
     """
-    Function to return the base url of the website. 
+    Function to return the base url of the website.
 
     Args: 
-        any_website_sub_url (str) : any url of the website 
+        any_website_sub_url (str) : any url of the website. Default it empty string and will return "https://ssphub.netlify.app/"
 
     Example:
         >>> get_url_root("https://ssphub.netlify.app/coucou/infolettre")
         'https://ssphub.netlify.app/' 
 
     """
-    p = urlparse(any_website_sub_url)
-    site_root = f"{p.scheme}://{p.netloc}/"   
-
+    if any_website_sub_url == "": 
+        site_root = "https://ssphub.netlify.app/"
+    else:
+        p = urlparse(any_website_sub_url)
+        site_root = f"{p.scheme}://{p.netloc}/"   
+    
     return site_root
 
 
