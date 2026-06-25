@@ -65,8 +65,8 @@ def rewrite_internal_links(html_content, newsletter_url):
     # Second - replace ../ by newsletter_url
     html_content = re.sub(r"\]\(\.\./", "](" + infolettre_url, html_content) 
 
-    # Third - replace /index.qmd) by /) so that url points to the right html page
-    html_content = re.sub(r"/index\.qmd\)", "/)", html_content)
+    # Third - replace .qmd) by .html) so that url points to the right html page
+    html_content = re.sub(r'.qmd\)', '.html)', html_content)
 
     return html_content
 
