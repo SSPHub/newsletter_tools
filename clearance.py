@@ -30,8 +30,12 @@ if __name__ == "__main__":
     parser.add_argument("-bcc", "--email_bcc", default="")
     parser.add_argument("-from", "--email_from", default="")
     parser.add_argument("-cc", "--email_cc", default=emails_cc)
-    parser.add_argument("-t", "--drop_temp", default=True)
-
+    parser.add_argument(
+        "-t",
+        "--drop_temp",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
     args = parser.parse_args()
 
     try:

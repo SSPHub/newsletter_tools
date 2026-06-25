@@ -28,8 +28,12 @@ if __name__ == "__main__":
     parser.add_argument("-bcc", "--email_bcc", default=get_emails())
     parser.add_argument("-from", "--email_from", default="")
     parser.add_argument("-cc", "--email_cc", default="")
-    parser.add_argument("-t", "--drop_temp", default="False")
-
+    parser.add_argument(
+        "-t",
+        "--drop_temp",
+        action=argparse.BooleanOptionalAction,
+        default=True,
+    )
     args = parser.parse_args()
 
     try:
@@ -39,7 +43,7 @@ if __name__ == "__main__":
             args.email_bcc,
             args.email_from,
             args.email_cc,
-            args.drop_temp == "True",
+            args.drop_temp,
             args.number,
             args.branch,
         )
