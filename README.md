@@ -80,15 +80,128 @@ The graph can be generated with `graphs.sh`
 
 ## Clearance
 
+Clearance is done with script clearance.py. 
 Function to generate a draft email based on newsletter number and branch name of the repo for clearance.
+The script automatically detects the branch and newsletter number if not specified.
 Not necessary to have published the newsletter.
+
+How the clearance.py script works : 
+
+### Function: `main(*args, **kwargs)`
+
+- **Description**: Wrapper for `generate_email`. All arguments are passed directly to `generate_email`.
+- **Args**: See `[generate_email](#generate_email-function)` for details.
+
+### Command-Line Arguments
+
+
+| Argument         | Short   | Type   | Default                                  | Description                                                                                                                         |
+| ---------------- | ------- | ------ | ---------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- |
+| `--number`       | `-n`    | `str`  | `None`                                   | Newsletter number (e.g., `21`). If not provided, the script auto-detects the highest number from branches matching `infolettre_XX`. |
+| `--branch`       | `-b`    | `str`  | `None`                                   | Branch name (e.g., `infolettre_21`). If not provided, the script auto-detects the branch.                                           |
+| `--email_object` | `-o`    | `str`  | `[SSPHub] Pour validation - infolettre`  | Subject line of the email.                                                                                                          |
+| `--email_to`     | `-to`   | `str`  | `EMAIL_VALIDATION_TO` (env)              | Recipient(s) for the email (semicolon-separated).                                                                                   |
+| `--email_bcc`    | `-bcc`  | `str`  | `""`                                     | BCC recipient(s) (semicolon-separated).                                                                                             |
+| `--email_from`   | `-from` | `str`  | `""`                                     | Sender email (display name in Outlook).                                                                                             |
+| `--email_cc`     | `-cc`   | `str`  | `EMAIL_VALIDATION_CC;EMAIL_SSPHUB` (env) | CC recipient(s) (semicolon-separated).                                                                                              |
+| `--drop_temp`    | `-t`    | `bool` | `True`                                   | If `True`, deletes temporary files (`.qmd`, `.html`) after generating the email.                                                    |
+
+### Examples 
+
+#### Generate a validation email for the latest newsletter:
+
+```bash
+uv run clearance.py
+```
+
+- Auto-detects the max branch (e.g., `infolettre_21`) and number (e.g., `21`).
+- Uses default recipients and subject.
+
+#### Generate a validation email for a specific newsletter:
+
+```bash
+uv run clearance.py -n 21 -b infolettre_21 -o "[SSPHub] Validation - Infolettre 21"
+```
+
+- Explicitly specifies the newsletter number, branch, and subject.
+
+#### Generate a validation email and keep temporary files:
+
+```bash
+uv run clearance.py --no-drop_temp
+```
+
+- Temporary files (`.qmd`, `.html`) are **not** deleted.
+
+### Workflow
+
+1. Auto-detects the branch and newsletter number if not provided.
+2. Fetches the `.qmd` file from the specified branch.
+3. Converts the `.qmd` file to HTML and generates an `.eml` file in the `.temp/` directory.
+4. Deletes temporary files unless `no-drop_temp` is raised.
 
 ![Generate email for clearance](docs/call_graph_clearance.png)
 
 ## Main
 
-Function to generate a draft email based on newsletter number and branch name of the repo.
+Script to send newsletter is in `main.py`. 
+Function to generate a draft email based on newsletter number in the `main` branch of the repo.
 Very similar to generate email for clearance, except that it retrieves the directory and that newsletter must be published..
+
+
+### Function: `main(*args, **kwargs)`
+
+- **Description**: Wrapper for `generate_email`. All arguments are passed directly to `generate_email`.
+- **Args**: See `[generate_email](#generate_email-function)` for details.
+
+### Command-Line Arguments
+
+
+| Argument         | Short   | Type  | Default                       | Description                                                                                                                                                   |
+| ---------------- | ------- | ----- | ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `--number`       | `-n`    | `str` | `None`                        | Newsletter number (e.g., `21`). If not provided, the script auto-detects the highest number from the `infolettre/infolettre_XX` folders in the `main` branch. |
+| `--branch`       | `-b`    | `str` | `main`                        | Branch name. Defaults to `main` (published newsletters).                                                                                                      |
+| `--email_object` | `-o`    | `str` | `[SSPHub] Infolettre de mars` | Subject line of the email.                                                                                                                                    |
+| `--email_to`     | `-to`   | `str` | `EMAIL_SSPHUB` (env)          | Recipient(s) for the email (semicolon-separated).                                                                                                             |
+| `--email_bcc`    | `-bcc`  | `str` | `get_emails()`                | BCC recipient(s) (semicolon-separated). Fetches emails from the SSPHub directory via Grist API.                                                               |
+| `--email_from`   | `-from` | `str` | `""`                          | Sender email (display name in Outlook).                                                                                                                       |
+| `--email_cc`     | `-cc`   | `str` | `""`                          | CC recipient(s) (semicolon-separated).                                                                                                                        |
+| `--drop_temp`    | `-t`    | `bool` | `True`                                   | If `True`, deletes temporary files (`.qmd`, `.html`) after generating the email.                                                          |
+
+### Examples
+
+#### Generate a sending email for the latest published newsletter:
+
+```bash
+uv run main.py
+```
+
+- Auto-detects the highest newsletter number from the `main` branch.
+- Uses default recipients and subject.
+
+#### Generate a sending email for a specific newsletter:
+
+```bash
+uv run main.py -n 21 -o "[SSPHub] Infolettre 21 - Juin 2026"
+```
+
+- Explicitly specifies the newsletter number and subject.
+
+#### Generate a sending email and delete temporary files:
+
+```bash
+uv run main.py --no-drop_temp
+```
+
+- Temporary files (`.qmd`, `.html`) are **not** deleted.
+
+---
+### Workflow
+
+1. Auto-detects the newsletter number from the `main` branch if not provided.
+2. Fetches the `.qmd` file from the `main` branch.
+3. Converts the `.qmd` file to HTML and generates an `.eml` file in the `.temp/` directory.
+4. Deletes temporary files if `drop_temp="True"`.
 
 ![Generate email - official send](docs/call_graph_main.png)
 
@@ -104,3 +217,19 @@ Newsletter must be published.
 Function to delete a detect emails and delete them from directory after newsletter has been sent.
 
 ![Delete accounts from directory](docs/call_graph_treat_replies.png)
+
+
+
+# Common Issues
+
+1. **Missing Environment Variables**:
+  - Ensure all required environment variables (e.g., `EMAIL_VALIDATION_TO`, `GRIST_API_KEY`) are set.
+  - Example error: `KeyError: 'EMAIL_VALIDATION_TO'`.
+2. **Branch/Number Not Found**:
+  - If the branch or newsletter number cannot be auto-detected, specify them explicitly using `-n` and `-b`.
+3. **GitHub API Limits**:
+  - The scripts fetch data from GitHub. If you hit rate limits, wait or use a GitHub token.
+4. **Grist API Errors**:
+  - Ensure `GRIST_API_KEY` and `GRIST_SSPHUB_DIRECTORY_ID` are correct.
+
+
