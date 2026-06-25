@@ -1,4 +1,4 @@
-from src.email.knit import add_link_to_description, parse_qmd_file
+from src.email.knit import add_link_to_description, parse_qmd_file, rewrite_internal_links, get_url_root
 from src.github.extract import (
     extract_published_max_nb,
     fetch_qmd_file,
@@ -33,7 +33,12 @@ def generate_tchap_message(number):
     # Fetching published newsletter
     qmd_content = fetch_qmd_file(raw_url_newsletter(number, branch="main"))
     # Extracting content of the newsletter
-    qmd_content_lines = parse_qmd_file(qmd_content)[1].split("\n")
+    qmd_content = parse_qmd_file(qmd_content)[1]
+    # Clean internal links in the qmd part
+    qmd_content = rewrite_internal_links(qmd_content, get_url_root())
+    
+    # Writing it as lines
+    qmd_content_lines = qmd_content.split("\n")
 
     # Removing images
     qmd_content_cleaned_lines = replace_lines_images(
